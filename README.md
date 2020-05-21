@@ -71,7 +71,7 @@ https://github.com/kubernetes/minikube/issues/2181#issuecomment-344183665
 
 ![hyperv-minikube-switch](images/hyperv-minikube-switch.png)
 
->It looks that running Minikube and Docker Engine on the same machine is problematic. For now I skipped this step.
+> :warning: It looks that running Minikube and Docker Engine on the same machine is problematic. For now I skipped this step.
 https://github.com/kubernetes/minikube/issues/5437
 
 ## Google Container Engine (GKE)
