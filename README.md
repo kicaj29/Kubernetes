@@ -174,7 +174,7 @@ kubectl delete service letskube-deployment
 
 * Declaratively (via YAML/JSON)
 
-[letskubedeploy.yml](letskube/letskubedeploy-my.yml)
+[letskubedeploy-my.yml](letskube/letskubedeploy-my.yml)
 
 ```
 kubectl create -f letskubedeploy-my.yml
