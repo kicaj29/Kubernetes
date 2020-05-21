@@ -52,6 +52,9 @@ The Kubernetes command-line tool, **kubectl**, allows you to run commands agains
 
 ## Minikube
 
+> :warning: It looks that running Minikube and Docker Engine on the same machine is problematic. THIS CHAPTER IS NOT COMPLETE.
+https://github.com/kubernetes/minikube/issues/5437
+
 ### structure
 ![minikube](images/minikube.png)
 
@@ -70,9 +73,6 @@ There is prerequist to create virtual swith in hyper-vthere is prerequisite to c
 https://github.com/kubernetes/minikube/issues/2181#issuecomment-344183665
 
 ![hyperv-minikube-switch](images/hyperv-minikube-switch.png)
-
-> :warning: It looks that running Minikube and Docker Engine on the same machine is problematic. For now I skipped this step.
-https://github.com/kubernetes/minikube/issues/5437
 
 ## Google Container Engine (GKE)
 GKE is Kubernetes.
