@@ -13,10 +13,15 @@
   * [Azure Kubernetes Service (AKS)](#azure-kubernetes-service--aks-)
     + [Building docker image](#building-docker-image)
     + [Deploying application to a local Kubernetes cluster](#deploying-application-to-a-local-kubernetes-cluster)
+    + [Pushing the Image to Azure Container Registry (ACR)](#pushing-the-image-to-azure-container-registry--acr-)
+    + [Deploy Azure Kubernetes Service](#deploy-azure-kubernetes-service)
   * [AWS Provider](#aws-provider)
   * [Manual install](#manual-install)
 - [links](#links)
 - [other](#other)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 # Masters
 Is Kubernates control plane.
