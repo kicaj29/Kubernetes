@@ -202,7 +202,98 @@ kubectl create -f letskubedeploy-my.yml
 
 ![create](images/create.png)
 
+### Pushing the Image to Azure Container Registry (ACR)
+
+> Prerequisite is to instal Azure CLI https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest
+
+```powershell
+# sign in to azure
+az login --tenant [tenantID]
+# check if there is selected
+az account show --output table
+# if different then default subscription should be set point it explicitly
+az account set --subscription [subscriptionID]
+
+# create resource group
+az group create -n letskuberg-jacek -l westeurope
+# create container registry
+az acr create -n letskubeacrjacek -g letskuberg-jacek -l westeurope --sku standard
+# we can print all container registries using the following command
+az acr list -o table
+# login to created ACR
+az acr login -n letskubeacrjacek
+# find login service name, it will be needed to push the image
+az acr list -o table
+# tag local image with login server name and tag
+docker tag letskube:local letskubeacrjacek.azurecr.io/letskube:v1
+# push the image letskubeacrjacek.azurecr.io/letskube:v1 (this command will create repository if it does not exists yet)
+docker push letskubeacrjacek.azurecr.io/letskube:v1
+# print all images from the created repository
+az acr repository list -n letskubeacrjacek -o table
+```
+
+### Deploy Azure Kubernetes Service
+
+1. Create Service Principal.
+```powershell
+# For applications it is recommended to register an application in Azure AD and create identity for the application (i.e. Service Principal).
+# To allow AKS interact with other Azure services or resources and Azure AD principle is used. For example if AKS needs to pull an image for Azure Container Registry it needs permissions to do so. We grant AKS these permissions by using Service Principal.
+az ad sp create-for-rbac --skip-assignment
+```
+![create-service-principal](images/create-service-principal.png)
+
+2. Grant created SP permission for reading images for the selected ACR.
+```powershell
+# Grant permissions for pulling images for ACR.
+$acrId = az acr show --name letskubeacrjacek --resource-group letskuberg-jacek --query "id" --output tsv
+az role assignment create --assignee [ServicePrincipalID] --role Reader --scope $acrId
+```
+![acrId](images/acrId.png)
+![assignPermission](images/assign-permission.png)
+
+3. Create AKS cluster.
+
+The following command will create AKS cluster:
+* with one node (VM)
+* with file where public and private keys are stored
+* assign it to the created principal
+
+> :warning: First 4 runs of this command failed. 5th run was successful. Ticket: https://github.com/Azure/azure-cli/issues/9585
+
+> It takes ~4 minutes to create the cluster.
+
+```powershell
+az aks create `
+    --name letskubeaksclusterjacek `
+    --resource-group letskuberg-jacek `
+    --node-count 1 `
+    --generate-ssh-keys `
+    --service-principal "c9b0bd8f-8273-42fe-bfc0-6125522c29a8" `
+    --client-secret "{password}" `
+    --location westeurope
+```
+> The above command will create also resoruce group **MC_letskuberg-jacek_letskubeaksclusterjacek_westeurope** with some resoruces mandatory to run the cluster.
+
+4. Connect kubectl with created AKS
+
+* Verify what are configured clusters and to which kubectl is connected
+
+![kubectl-context](images/kubectl-context.png)
+
+> Config file for kubectl is here %USERPROFILE%\.kube\config
+* Extend the config file by adding credentials to the created AKS
+
+```
+az aks get-credentials --name letskubeaksclusterjacek --resource-group letskuberg-jacek
+```
+
+![add-to-kube-config](images/add-to-kube-config.png)
+
+On the screen we can see that we are connected to the created AKS and there is 1 working node.
+
 ## AWS Provider
+
+
 
 TODO
 
