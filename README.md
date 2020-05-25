@@ -15,12 +15,11 @@
     + [Deploying application to a local Kubernetes cluster](#deploying-application-to-a-local-kubernetes-cluster)
     + [Pushing the Image to Azure Container Registry (ACR)](#pushing-the-image-to-azure-container-registry--acr-)
     + [Deploy Azure Kubernetes Service](#deploy-azure-kubernetes-service)
+    + [Deploy app to AKS](#deploy-app-to-aks)
   * [AWS Provider](#aws-provider)
   * [Manual install](#manual-install)
 - [links](#links)
 - [other](#other)
-
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 
 # Masters
@@ -269,10 +268,6 @@ The following command will create AKS cluster:
 * with file where public and private keys are stored
 * assign it to the created principal
 
-> :warning: First 4 runs of this command failed. 5th run was successful. Ticket: https://github.com/Azure/azure-cli/issues/9585
-
-> It takes ~4 minutes to create the cluster.
-
 ```powershell
 az aks create `
     --name letskubeaksclusterjacek `
@@ -283,8 +278,11 @@ az aks create `
     --client-secret "{password}" `
     --location westeurope
 ```
+> :warning: First 4 runs of this command failed. 5th run was successful. Ticket: https://github.com/Azure/azure-cli/issues/9585
 
-> :warning: The above command will create also resoruce group **MC_letskuberg-jacek_letskubeaksclusterjacek_westeurope** with some resoruces mandatory to run the cluster.
+> It takes ~4 minutes to create the cluster.
+
+> The above command will create also resoruce group **MC_letskuberg-jacek_letskubeaksclusterjacek_westeurope** with some resoruces mandatory to run the cluster.
 
 > :warning: From some reason created AKS had different service principal then pointed in create command! This can be checked using ```az aks list --resource-group letskuberg-jacek```. I had to assign proper permissions to this service principal using once again ```az role assignment create```. It was blocker because wihout fixing it pods where not able pull image (ImagePullBackOff error) from ACR!
 
