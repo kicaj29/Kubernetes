@@ -247,6 +247,12 @@ az ad sp create-for-rbac --skip-assignment
 ```
 ![create-service-principal](images/create-service-principal.png)
 
+In case you forgot password to the service principal you can reset it using 
+
+```
+az ad sp credential reset --name c9b0bd8f-8273-42fe-bfc0-6125522c29a8
+```
+
 2. Grant created SP permission for reading images for the selected ACR.
 ```powershell
 # Grant permissions for pulling images for ACR.
@@ -277,7 +283,13 @@ az aks create `
     --client-secret "{password}" `
     --location westeurope
 ```
-> The above command will create also resoruce group **MC_letskuberg-jacek_letskubeaksclusterjacek_westeurope** with some resoruces mandatory to run the cluster.
+
+> :warning: The above command will create also resoruce group **MC_letskuberg-jacek_letskubeaksclusterjacek_westeurope** with some resoruces mandatory to run the cluster.
+
+> :warning: From some reason created AKS had different service principal then pointed in create command! This can be checked using ```az aks list --resource-group letskuberg-jacek```. I had to assign proper permissions to this service principal using once again ```az role assignment create```. It was blocker because wihout fixing it pods where not able pull image (ImagePullBackOff error) from ACR!
+
+![working-aks-pods](images/working-aks-pods.png)
+
 
 4. Connect kubectl with created AKS
 
@@ -295,6 +307,29 @@ az aks get-credentials --name letskubeaksclusterjacek --resource-group letskuber
 ![add-to-kube-config](images/add-to-kube-config.png)
 
 On the screen we can see that we are connected to the created AKS and there is 1 working node.
+
+### Deploy app to AKS
+
+To deploy the app we have to modify yml file.
+
+1. Image has to point created ACR (Azure Container Registry). To do this we need to know login server.   
+```
+az acr list --resource-group letskuberg-jacek --query "[].{acrLoginServer:loginServer}" --output table
+```
+
+![login-server-name](images/login-server-name.png)
+
+2. Set service type from NodePort to LoadBalancer
+
+[letskubedeploy-my-azure.yml](letskube/letskubedeploy-my-azure.yml)
+
+When the file is ready next we can execute deployment:
+
+![deploy-to-aks](images/deploy-to-aks.png)
+
+Finally we can open http://51.105.119.193/ in web browser and see working app:
+
+![web-app-aks](images/web-app-aks.png)
 
 ## AWS Provider
 
