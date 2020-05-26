@@ -16,11 +16,13 @@
     + [Pushing the Image to Azure Container Registry (ACR)](#pushing-the-image-to-azure-container-registry--acr-)
     + [Deploy Azure Kubernetes Service](#deploy-azure-kubernetes-service)
     + [Deploy app to AKS](#deploy-app-to-aks)
+    + [Scale nodes manually](#scale-nodes-manually)
+    + [Scale pods manually](#scale-pods-manually)
+    + [Update application in AKS cluster](#update-application-in-aks-cluster)
   * [AWS Provider](#aws-provider)
   * [Manual install](#manual-install)
 - [links](#links)
 - [other](#other)
-
 
 # Masters
 Is Kubernates control plane.
