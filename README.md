@@ -329,6 +329,66 @@ Finally we can open http://51.105.119.193/ in web browser and see working app:
 
 ![web-app-aks](images/web-app-aks.png)
 
+### Scale nodes manually
+
+```
+az aks scale --resource-group letskuberg-jacek --name=letskubeaksclusterjacek --node-count 3
+```
+![scale-nodes](images/scale-nodes.png)
+
+### Scale pods manually
+
+First we can check current pods:
+
+![pods-and-nodes](images/pods-and-nodes.png)
+
+Next we can scale pods:
+
+```
+kubectl scale --replicas=5 deployment/letskube-deployment
+```
+
+![scale-pods](images/scale-pods.png)
+
+### Update application in AKS cluster
+
+1. Change soruce code of the app and rebuild it.
+
+2. Create new image and tag it.
+
+```
+docker build . -t letskubeacrjacek.azurecr.io/letskube:v2
+```
+
+3. Login to ACR
+
+```
+az acr login -n letskubeacrjacek
+```
+
+4. Push the image.
+
+```
+docker push letskubeacrjacek.azurecr.io/letskube:v2
+```
+
+5. Check in Azure portal that v2 is in the registry
+
+![acr-v2](images/acr-v2.png)
+
+6. Pull new version of the image
+
+```
+kubectl set image deployment letskube-deployment letskube=letskubeacrjacek.azurecr.io/letskube:v2
+```
+**This command will terminate all existing pods and will create new pods!**
+
+> NOTE: this can be done also via letskubedeploy-my-azure.yml by change "image: letskubeacrjacek.azurecr.io/letskube:v1" -> image: "letskubeacrjacek.azurecr.io/letskube:v2" and executing new deployment.
+
+7. Open the app and check its version.
+
+![app-v2](images/app-v2.png)
+
 ## AWS Provider
 
 
