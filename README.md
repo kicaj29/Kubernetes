@@ -67,6 +67,13 @@ Deployments are described via YAML or JSON manifest file. They are deployed via 
 
 **Deployments are a newer and higher level concept than Replication Controllers.**
 
+# Persistent Volumes
+https://www.youtube.com/watch?v=x2sMWUkasoE
+https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+
+# Virtual Kubelet
+https://virtual-kubelet.io/
+
 # Installation
 
 ## kubectl
@@ -391,6 +398,12 @@ kubectl set image deployment letskube-deployment letskube=letskubeacrjacek.azure
 
 ![app-v2](images/app-v2.png)
 
+### Kubernetes dashboard
+
+```
+az aks browse -g letskuberg-jacek -n letskubeaksclusterjacek
+```
+
 ## AWS Provider
 
 
@@ -408,6 +421,7 @@ https://app.pluralsight.com/library/courses/azure-container-service-big-picture/
 https://github.com/ManojNair/letskube
 https://www.youtube.com/watch?v=5lzUpDtmWgM
 https://codefresh.io/kubernetes-tutorial/local-kubernetes-windows-minikube-vs-docker-desktop/
+https://helm.sh/
 
 # other 
 az account set --subscription "RSW Continuous Delivery" 
