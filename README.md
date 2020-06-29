@@ -21,6 +21,7 @@
     + [Update application in AKS cluster](#update-application-in-aks-cluster)
   * [AWS Provider](#aws-provider)
   * [Manual install](#manual-install)
+  * [Kubernetes dashboard](#kubernetes-dashboard)
 - [links](#links)
 - [other](#other)
 
@@ -62,6 +63,8 @@ Other important points:
 
 ![multi-instances-in-diff-nodes](images/multi-instances-in-diff-nodes.png)
 
+More can be found here: https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0
+
 # Deployments
 Deployments are described via YAML or JSON manifest file. They are deployed via *apiserver* from master.
 
@@ -85,13 +88,53 @@ The Kubernetes command-line tool, **kubectl**, allows you to run commands agains
 
 ## Minikube
 
-> :warning: It looks that running Minikube and Docker Engine on the same machine is problematic. THIS CHAPTER IS NOT COMPLETE.
-https://github.com/kubernetes/minikube/issues/5437
-
 ### structure
 ![minikube](images/minikube.png)
 
-### installation
+### Install Minikube on Ubuntu 18.04
+
+> :warning: THIS CHAPTER IS NOT COMPLETE. It did not work on my machine probably because of conflict between hyper-v and virtual box (I was using laptop with Win10 and Ubuntu run using hyper-v).
+
+![minikube-fail](images/minikube-fail.png)
+
+https://www.youtube.com/watch?v=m6InGYXR4LI   
+
+1. Prerequisite: VirtualBox
+
+```sh
+sudo su
+apt-get install -y virtualbox
+```
+
+2. Prerequisite: curl
+
+```sh
+apt install curl
+```
+
+3. Prerequisite: kubectl
+
+```sh
+curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.5.1/bin/linux/amd64/kubectl
+chmod +x kubectl
+mv kubectl /usr/local/bin/kubectl
+```
+
+4. minikube
+
+```sh
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.9.2/minikube-linux-amd64
+chmod +x minikube
+mv minikube /usr/local/bin
+minikube start --vm-driver virtualbox
+```
+NOTE: command *minikube start* should not be executed from root account. If *sudo su* was executed earlier close current and open new terminal.
+https://github.com/kubernetes/minikube/issues/7659
+
+### installation on Win10
+
+> :warning: It looks that running Minikube and Docker Engine on the same machine is problematic. THIS CHAPTER IS NOT COMPLETE.
+https://github.com/kubernetes/minikube/issues/5437
 
 ```
 choco install minikube
@@ -110,7 +153,7 @@ https://github.com/kubernetes/minikube/issues/2181#issuecomment-344183665
 ## Google Container Engine (GKE)
 GKE is Kubernetes.
 
-## Azure Kubernetes Service (AKS)
+## Azure Kubernetes Service (AKS) - INCLUDES LOCAL CLUSTER FROM DOCKER!!!
 
 ### Building docker image
 
@@ -414,14 +457,36 @@ TODO
 
 TODO
 
-# links
-https://app.pluralsight.com/library/courses/getting-started-kubernetes   
+# Kubernetes dashboard
 
-https://app.pluralsight.com/library/courses/azure-container-service-big-picture/table-of-contents
-https://github.com/ManojNair/letskube
-https://www.youtube.com/watch?v=5lzUpDtmWgM
-https://codefresh.io/kubernetes-tutorial/local-kubernetes-windows-minikube-vs-docker-desktop/
-https://helm.sh/
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+kubectl proxy
+```
+
+Next open in web browser http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+To find token execute:
+
+```
+kubectl -n kubernetes-dashboard get sa
+kubectl -n kubernetes-dashboard describe sa kubernetes-dashboard
+kubectl -n kubernetes-dashboard describe describe secret [TOKEN]
+kubectl -n kubernetes-dashboard describe secret [TOKEN]
+```
+
+![get-token](images/get-token.png)
+
+Next paste value from red rectangle to input for from the dashboard web UI.
+
+# links
+https://app.pluralsight.com/library/courses/getting-started-kubernetes    
+https://app.pluralsight.com/library/courses/azure-container-service-big-picture/table-of-contents    
+https://github.com/ManojNair/letskube   
+https://www.youtube.com/watch?v=5lzUpDtmWgM   
+https://codefresh.io/kubernetes-tutorial/local-kubernetes-windows-minikube-vs-docker-desktop/   
+https://helm.sh/  
+https://www.youtube.com/watch?v=GhZi4DxaxxE   (Kubernetes Ingress Explained Completely For Beginners - Updated)
 
 # other 
 az account set --subscription "RSW Continuous Delivery" 
