@@ -3,14 +3,17 @@
 - [Pods](#pods)
 - [Services](#services)
 - [Deployments](#deployments)
+- [Persistent Volumes](#persistent-volumes)
+- [Virtual Kubelet](#virtual-kubelet)
 - [Installation](#installation)
   * [kubectl](#kubectl)
   * [Minikube](#minikube)
     + [structure](#structure)
-    + [installation](#installation)
+    + [Install Minikube on Ubuntu 18.04](#install-minikube-on-ubuntu-1804)
+    + [installation on Win10](#installation-on-win10)
     + [running](#running)
   * [Google Container Engine (GKE)](#google-container-engine--gke-)
-  * [Azure Kubernetes Service (AKS)](#azure-kubernetes-service--aks-)
+  * [Azure Kubernetes Service (AKS) - INCLUDES LOCAL CLUSTER FROM DOCKER!!!](#azure-kubernetes-service--aks----includes-local-cluster-from-docker---)
     + [Building docker image](#building-docker-image)
     + [Deploying application to a local Kubernetes cluster](#deploying-application-to-a-local-kubernetes-cluster)
     + [Pushing the Image to Azure Container Registry (ACR)](#pushing-the-image-to-azure-container-registry--acr-)
@@ -19,11 +22,15 @@
     + [Scale nodes manually](#scale-nodes-manually)
     + [Scale pods manually](#scale-pods-manually)
     + [Update application in AKS cluster](#update-application-in-aks-cluster)
+    + [Kubernetes dashboard AKS](#kubernetes-dashboard-aks)
   * [AWS Provider](#aws-provider)
   * [Manual install](#manual-install)
-  * [Kubernetes dashboard](#kubernetes-dashboard)
+- [Kubernetes dashboard](#kubernetes-dashboard)
 - [links](#links)
 - [other](#other)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 # Masters
 Is Kubernates control plane.
@@ -441,7 +448,7 @@ kubectl set image deployment letskube-deployment letskube=letskubeacrjacek.azure
 
 ![app-v2](images/app-v2.png)
 
-### Kubernetes dashboard
+### Kubernetes dashboard AKS
 
 ```
 az aks browse -g letskuberg-jacek -n letskubeaksclusterjacek
