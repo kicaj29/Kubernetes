@@ -223,7 +223,8 @@ docker rm -f {container ID}
 ![version](images/version.png)
 
 3. Create alias for command kubectl to have less typing (execute in PowerShell and not cmd) and test basic kubectl commands.
-![k-basic-commands](images/k-basic-commands.png)
+![k-basic-commands](images/k-basic-commands.png) 
+   >NOTE: Config file for kubectl is here %USERPROFILE%.kube\config
 
 4. Deployment
 
