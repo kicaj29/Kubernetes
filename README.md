@@ -229,10 +229,22 @@ docker rm -f {container ID}
 4. Deployment
 
 * Interactively (via kubectl)
+```ps
+PS D:\> kubectl run letskube-deployment --image=letskube:local --port=80 --replicas=3
+kubectl run --generator=deployment/apps.v1 is DEPRECATED and will be removed in a future version. Use kubectl run --generator=run-pod/v1 or kubectl create instead.
+deployment.apps/letskube-deployment created
+PS D:\> kubectl get deployments
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+letskube-deployment   3/3     3            3           12s
+PS D:\> kubectl get rs
+NAME                             DESIRED   CURRENT   READY   AGE
+letskube-deployment-76b4b98b78   3         3         3       17s
+PS D:\> kubectl get pods
+NAME                                   READY   STATUS    RESTARTS   AGE
+letskube-deployment-76b4b98b78-4nm6w   1/1     Running   0          23s
+letskube-deployment-76b4b98b78-j7rv9   1/1     Running   0          23s
+letskube-deployment-76b4b98b78-vr677   1/1     Running   0          23s
 ```
-kubectl run letskube-deployment --image=letskube:local --port=80 --replicas=3
-```
-![deployment-interactively](images/deployment-interactively.png)
 
 Next we have to create a kubernetes service that will make possible connecting to the deployed app. There are couple service types.
 
