@@ -482,7 +482,6 @@ To find token execute:
 kubectl -n kubernetes-dashboard get sa
 kubectl -n kubernetes-dashboard describe sa kubernetes-dashboard
 kubectl -n kubernetes-dashboard describe secret [TOKEN]
-kubectl -n kubernetes-dashboard describe secret [TOKEN]
 ```
 
 ![get-token](images/get-token.png)
