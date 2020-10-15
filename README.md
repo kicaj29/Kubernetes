@@ -6,6 +6,7 @@
 - [Persistent Volumes](#persistent-volumes)
 - [Virtual Kubelet](#virtual-kubelet)
 - [Installation](#installation)
+  - [ways to run Kubernetes](#ways-to-run-kubernetes)
   - [kubectl](#kubectl)
   - [Minikube](#minikube)
     - [structure](#structure)
@@ -85,6 +86,20 @@ https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 https://virtual-kubelet.io/
 
 # Installation
+
+## ways to run Kubernetes
+
+* Cloud Machines (K8s in VMs)
+  * Pay as you go
+  * No upfront cost
+  * Scale down as needed
+* Managed K8s, all above plus:
+  * no charge for Master on some providers
+* Serverless Node Pool
+  * pods given resources on demand
+  * No VMs to managed
+* Reserved Instances
+  * reduced hourly rate for nodes
 
 ## kubectl
 The Kubernetes command-line tool, **kubectl**, allows you to run commands against Kubernetes clusters.
