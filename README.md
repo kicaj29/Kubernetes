@@ -20,7 +20,10 @@
     - [installation on Win10](#installation-on-win10)
     - [running](#running)
   - [Google Container Engine (GKE)](#google-container-engine-gke)
-  - [Azure Kubernetes Service (AKS) - INCLUDES LOCAL CLUSTER FROM DOCKER!!!](#azure-kubernetes-service-aks---includes-local-cluster-from-docker)
+  - [Azure Kubernetes Service (AKS)](#azure-kubernetes-service-aks)
+  - [K8s from docker desktop](#k8s-from-docker-desktop)
+- [Examples](#examples)
+  - [lestkube](#lestkube)
     - [Building docker image](#building-docker-image)
     - [Deploying application to a local Kubernetes cluster](#deploying-application-to-a-local-kubernetes-cluster)
     - [Pushing the Image to Azure Container Registry (ACR)](#pushing-the-image-to-azure-container-registry-acr)
@@ -30,8 +33,6 @@
     - [Scale pods manually](#scale-pods-manually)
     - [Update application in AKS cluster](#update-application-in-aks-cluster)
     - [Kubernetes dashboard AKS](#kubernetes-dashboard-aks)
-  - [AWS Provider](#aws-provider)
-  - [Manual install](#manual-install)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 - [other](#other)
@@ -78,6 +79,7 @@ Followers always proxy to the leader.
 * kube-controller-manager
   * node controller
   * deployment controller
+  * replica set controller (for amount of pods)
   * etc.
   * each such controller works in reconciliation loop: reconciles observed state with desired state 
 * scheduler
@@ -109,28 +111,29 @@ Pod is atomic unit of scheduling. A Pod always runs on a Node. A Node can have m
 
 ![05-shared-exe-env.png](images/05-shared-exe-env.png)
 
-
 If there is uses case when 2 services have to be tight coupled then they should be placed in the same pod, if not then they should be placed in separated pods.
 
 To scale up/down Kubernetes control amount of pods and not containers inside pod.
 ![pods-scaling](images/pods-scaling.png)
 
-**Pods do not support resurrection. Every time new pod is set up it is completely new pod.**
+**Pods do not support resurrection. Every time new pod is set up it is completely new pod.** It means also that pods do not have fixed IP addresses - that`s why concept of services and labels was introduced.
 
 # Services
-Services offers fixed IP address, DNS name and load balancing. It is needed becasue new pods get different IP addresses every time.
+Services offers **fixed** IP address, DNS name and load balancing. It is needed because new pods get different IP addresses every time.
 
 **Pods are assigned to a service via labels.**
 
 ![Service](images/service.png)
 
+![Service-labels](images/05-service-and-labels.png)
+
 Other important points:
 
-1. Service only send to healhy pods.
+1. Service only send to healthy pods.
 2. Service can be configured for session affinity.
 3. Service can point to things outside the cluster.
 4. Random load balancing.
-5. Uses TCP by default.
+5. Uses TCP by default but UDP is also supported.
 
 ![service-multiple-instances-in-same-node](images/service-multiple-instances-in-same-node.png)
 
@@ -238,9 +241,19 @@ https://github.com/kubernetes/minikube/issues/2181#issuecomment-344183665
 ![hyperv-minikube-switch](images/hyperv-minikube-switch.png)
 
 ## Google Container Engine (GKE)
-GKE is Kubernetes.
+GKE is Kubernetes in Google Cloud.
 
-## Azure Kubernetes Service (AKS) - INCLUDES LOCAL CLUSTER FROM DOCKER!!!
+## Azure Kubernetes Service (AKS)
+AKS is Kubernetes in Azure.
+
+## K8s from docker desktop
+
+Works without problems on Win10!.
+![k8s-docker-desktop](images/06-k8s-docker-desktop.png)
+
+# Examples
+
+## lestkube
 
 ### Building docker image
 
@@ -548,16 +561,6 @@ kubectl set image deployment letskube-deployment letskube=letskubeacrjacek.azure
 ```
 az aks browse -g letskuberg-jacek -n letskubeaksclusterjacek
 ```
-
-## AWS Provider
-
-
-
-TODO
-
-## Manual install
-
-TODO
 
 # Kubernetes dashboard
 
