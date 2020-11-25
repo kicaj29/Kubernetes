@@ -33,6 +33,7 @@
     - [Scale pods manually](#scale-pods-manually)
     - [Update application in AKS cluster](#update-application-in-aks-cluster)
     - [Kubernetes dashboard AKS](#kubernetes-dashboard-aks)
+  - [another nodejs example](#another-nodejs-example)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 - [other](#other)
@@ -561,6 +562,10 @@ kubectl set image deployment letskube-deployment letskube=letskubeacrjacek.azure
 ```
 az aks browse -g letskuberg-jacek -n letskubeaksclusterjacek
 ```
+
+## another nodejs example
+
+[another nodejs example](./another-nodejs-example)
 
 # Kubernetes dashboard
 
