@@ -1,5 +1,11 @@
 - [Masters](#masters)
+  - [Amount of Masters Nodes](#amount-of-masters-nodes)
+  - [Master elements.](#master-elements)
 - [Nodes](#nodes)
+  - [Kubelet - Kubernetes agent](#kubelet---kubernetes-agent)
+  - [Container runtime](#container-runtime)
+  - [Kube-proxy](#kube-proxy)
+  - [Nodeless Kubernetes](#nodeless-kubernetes)
 - [Pods](#pods)
 - [Services](#services)
 - [Deployments](#deployments)
@@ -27,27 +33,86 @@
   - [AWS Provider](#aws-provider)
   - [Manual install](#manual-install)
 - [Kubernetes dashboard](#kubernetes-dashboard)
-- [links](#links)
+- [resources](#resources)
 - [other](#other)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 
 # Masters
-Is Kubernates control plane.
+Masters are Kubernates control plane.
 ![Master](images/master.png)
+
+In production environment masters always should be deployed as multi-master H/A control plane:
+![01-multi-masters-HA.png](images/01-multi-masters-HA.png)
+
+## Amount of Masters Nodes
+Typically in HA configuration for Masters are 3 or 5 nodes.
+This amount of nodes make easier to achieve cluster consensus and avoid [split brain](https://support.oneidentity.com/syslog-ng-store-box/kb/264445/recovering-from-split-brain-situation-in-high-availability-environment) and **deadlock**.
+
+> NOTE: A split brain situation is caused by a temporary failure of the network link between the cluster nodes, resulting in both nodes switching to the active (primary) role while disconnected. This might cause new data (for example, log messages) to be created on both nodes without being replicated to the other node. Thus, it is likely in this situation that two diverging sets of data have been created, which cannot be trivially merged.
+
+For example in case of 4 masters **deadlock** can occur because none of the nodes could not ping more then 2 nodes - if none of the nodes can be sure that can communicate with majority then all nodes (cluster) go to read-only mode. EKS will still work but we will not be able to do any change there, for example new deployment will not be possible.
+
+![02-deadlock.png](images/02-deadlock.png)
+
+**In case of K8s control plane (masters) only one master is active:**
+
+![03-masters-leader.png](images/03-masters-leader.png)
+
+Followers always proxy to the leader.
+
+## Master elements.
+
+[Elements](https://kubernetes.io/docs/concepts/overview/components/)
+
+* kube-apiserver
+  * front-end to the control plane
+  * exposes the API (REST)
+  * consumes JSON/YAML
+* cluster store
+  * the only persistent component in the whole control plane
+  * persists cluster state and config
+  * based on [etcd](https://etcd.io/)
+  * have recovery plans in place
+* kube-controller-manager
+  * node controller
+  * deployment controller
+  * etc.
+  * each such controller works in reconciliation loop: reconciles observed state with desired state 
+* scheduler
+  * watches for newly created Pods with no assigned node, and selects a node for them to run on
 
 # Nodes
 There are 3 main elements in a node: **Kubelet**, **container engine**, **kube-proxy**.
 
-Node is component where **Kubelet** (Kubernetes agent) is installed. We can say that Kubelet is a node. It registers node with cluster and reports its status to master. Using port :10255 we can inspect the kubelet (/spec, /healthz, /pods).   
-Other 2 main elements are **container engine** and **kube-proxy** e.g. it takes care that node has IP address (all containers in a pod share single IP).
+## Kubelet - Kubernetes agent
+
+Node is component where **Kubelet** (Kubernetes agent) is installed. We can say that Kubelet is a node. It registers node with cluster and reports its status to master. Using port :10255 we can inspect the kubelet (/spec, /healthz, /pods).
+
+## Container runtime
+The container runtime is the software that is responsible for running containers. Usually it is Docker.
+
+## Kube-proxy
+It takes care that **pod** has IP address (all containers in a pod share single IP). To reach individual containers in a pod we have to use ports. It takes role also of basic load balancing.
+It is part of the Kubernetes Service concept:
+
+## Nodeless Kubernetes
+[Nodeless Kubernetes](https://www.elotl.co/nodeless-kubernetes.html)
+
+
+![04-kube-proxy.png](images/04-kube-proxy.png)
 
 # Pods
 Pod is atomic unit of scheduling. A Pod always runs on a Node. A Node can have multiple pods. It is like a sandbox that runs containers in itself.  
-**All containers in pod share the pod environment.** If there is uses case when 2 services have to be tight coupled then they should be placed in the same pod, if not then they should be placed in separated pods.
+**All containers in pod share the pod environment, for example they share file system.** That`s why it is also called shared execution environment:
 
-To scale up/down Kubernetes control ammount of pods and not containers inside pod.
+![05-shared-exe-env.png](images/05-shared-exe-env.png)
+
+
+If there is uses case when 2 services have to be tight coupled then they should be placed in the same pod, if not then they should be placed in separated pods.
+
+To scale up/down Kubernetes control amount of pods and not containers inside pod.
 ![pods-scaling](images/pods-scaling.png)
 
 **Pods do not support resurrection. Every time new pod is set up it is completely new pod.**
@@ -515,7 +580,7 @@ kubectl -n kubernetes-dashboard describe secret [TOKEN]
 
 Next paste value from red rectangle to input for from the dashboard web UI.
 
-# links
+# resources
 https://app.pluralsight.com/library/courses/getting-started-kubernetes    
 https://app.pluralsight.com/library/courses/azure-container-service-big-picture/table-of-contents    
 https://github.com/ManojNair/letskube   
@@ -523,6 +588,8 @@ https://www.youtube.com/watch?v=5lzUpDtmWgM
 https://codefresh.io/kubernetes-tutorial/local-kubernetes-windows-minikube-vs-docker-desktop/   
 https://helm.sh/  
 https://www.youtube.com/watch?v=GhZi4DxaxxE   (Kubernetes Ingress Explained Completely For Beginners - Updated)
+https://app.pluralsight.com/library/courses/kubernetes-developers-moving-cloud/table-of-contents (aws, azure, google)   
+https://app.pluralsight.com/library/courses/kubernetes-getting-started/table-of-contents
 
 # other 
 az account set --subscription "RSW Continuous Delivery" 
