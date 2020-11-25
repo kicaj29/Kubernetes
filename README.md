@@ -22,6 +22,7 @@
   - [Google Container Engine (GKE)](#google-container-engine-gke)
   - [Azure Kubernetes Service (AKS)](#azure-kubernetes-service-aks)
   - [K8s from docker desktop](#k8s-from-docker-desktop)
+- [kubectl apply vs create](#kubectl-apply-vs-create)
 - [Examples](#examples)
   - [lestkube](#lestkube)
     - [Building docker image](#building-docker-image)
@@ -34,6 +35,11 @@
     - [Update application in AKS cluster](#update-application-in-aks-cluster)
     - [Kubernetes dashboard AKS](#kubernetes-dashboard-aks)
   - [another nodejs example](#another-nodejs-example)
+    - [build another-app image](#build-another-app-image)
+    - [publish another-app image to docker hub](#publish-another-app-image-to-docker-hub)
+    - [create pod manifest (YAML)](#create-pod-manifest-yaml)
+      - [apply pod manifest](#apply-pod-manifest)
+    - [create multi container pod manifest (YAML)](#create-multi-container-pod-manifest-yaml)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 - [other](#other)
@@ -251,6 +257,20 @@ AKS is Kubernetes in Azure.
 
 Works without problems on Win10!.
 ![k8s-docker-desktop](images/06-k8s-docker-desktop.png)
+
+# kubectl apply vs create
+
+[apply vs create](https://intellipaat.com/community/468/difference-between-kubectl-apply-and-kubectl-create)   
+https://kubernetes.io/docs/tasks/manage-kubernetes-objects/imperative-config/   
+https://kubernetes.io/docs/tasks/manage-kubernetes-objects/declarative-config/   
+
+
+| Kubectl apply (declarative)       | Kubectl create (imperative)          | 
+| ------------- |-------------|
+| It directly updates in the current live source, only the attributes which are given in the file.      | It first deletes the resources and then creates it from the file provided.|
+| The file used in apply can be an incomplete spec      | The file used in create should be complet      |
+| Apply works only on some properties of the resources | Create works on every property of the resources      |
+| You can apply a file that changes only an annotation, without specifying any other properties of the resource. | If you will use the same file with a replace command, the command would fail, due to the missing information. |
 
 # Examples
 
@@ -567,6 +587,60 @@ az aks browse -g letskuberg-jacek -n letskubeaksclusterjacek
 
 [another nodejs example](./another-nodejs-example)
 
+### build another-app image
+
+```
+docker image build -t kicaj29/another-app:1.0 .
+```
+
+### publish another-app image to docker hub
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\App> docker image push kicaj29/another-app:1.0
+The push refers to repository [docker.io/kicaj29/another-app]
+493c8cfdf52f: Pushed
+22d12f79ba67: Pushed
+e41e234975c9: Mounted from library/node
+d68967c78819: Mounted from library/node
+7ef3fa57625c: Mounted from library/node
+c447987a5233: Mounted from library/node
+4d3dd4268d84: Mounted from library/node
+1.0: digest: sha256:1fe46dc33b6442ebbe5700c94891b267c59de772709c62760db62d5a861d3668 size: 1787
+```
+
+### create pod manifest (YAML)
+
+[pod manifest](./another-nodejs-example/Pods/pod.yml)
+
+#### apply pod manifest
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl apply -f pod.yml
+pod/hello-pod created
+PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl get pod hello-pod -o wide
+NAME        READY   STATUS    RESTARTS   AGE     IP           NODE             NOMINATED NODE   READINESS GATES
+hello-pod   1/1     Running   0          2m10s   10.1.1.175   docker-desktop   <none>           <none>
+```
+
+To get full description for the pod run:
+```
+kubectl describe pods hello-pod
+```
+
+### create multi container pod manifest (YAML)
+
+[multi container pod manifest](./another-nodejs-example/Pods/multi-pod.yml)
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl apply -f multi-pod.yml
+pod/multi-container-pod created
+S D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl get pod multi-container-pod -o wide
+NAME                  READY   STATUS    RESTARTS   AGE   IP           NODE             NOMINATED NODE   READINESS GATES
+multi-container-pod   2/2     Running   0          21s   10.1.1.176   docker-desktop   <none>           <none>
+PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl delete pod multi-container-pod
+pod "multi-container-pod" deleted
+```
+
 # Kubernetes dashboard
 
 ```
@@ -597,7 +671,9 @@ https://codefresh.io/kubernetes-tutorial/local-kubernetes-windows-minikube-vs-do
 https://helm.sh/  
 https://www.youtube.com/watch?v=GhZi4DxaxxE   (Kubernetes Ingress Explained Completely For Beginners - Updated)
 https://app.pluralsight.com/library/courses/kubernetes-developers-moving-cloud/table-of-contents (aws, azure, google)   
-https://app.pluralsight.com/library/courses/kubernetes-getting-started/table-of-contents
+https://app.pluralsight.com/library/courses/kubernetes-getting-started/table-of-contents   
+
+Another good example is in my repo with helm: https://github.com/kicaj29/helm
 
 # other 
 az account set --subscription "RSW Continuous Delivery" 

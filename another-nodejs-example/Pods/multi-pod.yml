@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx
+  name: multi-container-pod
 spec:
   containers:
-  - name: main-ctr
+  - name: main-ctr  # main container runs some nginx stuff...
     image: nigelpoulton/nginxadapter:1.0
     ports:
     - containerPort: 80
-  - name: helper-ctr
+  - name: helper-ctr # helper container: it takes nginx logs and format them to format required by 3rd party tool prometheus
     image: nginx/nginx-prometheus-exporter
     args: ["-nginx.scrape-uri","http://localhost/nginx_status"]
     ports:

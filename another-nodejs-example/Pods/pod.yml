@@ -1,13 +1,20 @@
-# Simple Kubernetes Pod to deploy the app contained in nigelpoulton/getting-started-k8s:1.0
+# Simple Kubernetes Pod to deploy the app contained in kicaj29/another-app:1.0
+
+# versioning: alpha (v1alpha1, v1alpha2) -> beta (v1beta1, v1beta2) -> GA/stable (v1)
+# using alpha features might require manual enabling them in K8s cluster!
 apiVersion: v1
+# kind: Deployment, DaemonSet, ReplicaSet, StatefulSet, ...
+# because there are so many kinds api has been grouped: apps/v1: Deployment, DaemonSet, ReplicaSet, StatefulSet
+# batch/v1beta1: CronJob
+# core/v1 but because it exists from the very beginning we just use v1: pod, pv, pvc, ...
 kind: Pod
 metadata:
-  name: hello-pod
+  name: hello-pod # name of the pod
   labels:
     app: web
 spec:
   containers:
-    - name: web-ctr
-      image: nigelpoulton/getting-started-k8s:1.0
+    - name: web-ctr # name for the container (this will be used as a name for the running container in the pod)
+      image: kicaj29/another-app:1.0 # by default K8s pulls images from docker hub
       ports:
-        - containerPort: 8080
+        - containerPort: 8080 # containerPort has to match port set in dockerfile 'EXPOSE 8080'
