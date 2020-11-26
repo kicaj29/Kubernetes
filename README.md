@@ -43,7 +43,8 @@
     - [publish another-app image to docker hub](#publish-another-app-image-to-docker-hub)
     - [create pod manifest (YAML) and apply it](#create-pod-manifest-yaml-and-apply-it)
     - [create multi container pod manifest (YAML) and apply it](#create-multi-container-pod-manifest-yaml-and-apply-it)
-    - [create service - imperative way](#create-service---imperative-way)
+    - [create service node port - imperative way](#create-service-node-port---imperative-way)
+    - [create service node port - declarative way](#create-service-node-port---declarative-way)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 - [other](#other)
@@ -153,7 +154,7 @@ Other important points:
 ![multi-instances-in-diff-nodes](images/multi-instances-in-diff-nodes.png)
 
 Service types:
-* Cluster IP: gives you a service inside your cluster that other apps inside your cluster can access. There is no external access.
+* Cluster IP: default service type. Gives you a service inside your cluster that other apps inside your cluster can access. There is no external access.
 * NodePort:  NodePort, as the name implies, opens a specific port on all the Nodes (the VMs), and any traffic that is sent to this port is forwarded to the service.
 * LoadBalancer: will give you a single IP address that will forward all traffic to your service.
 * Ingress: is actually NOT a type of service. Instead, it sits in front of multiple services and act as a “smart router” or entry point into your cluster.
@@ -664,7 +665,7 @@ PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl delete pod 
 pod "multi-container-pod" deleted
 ```
 
-### create service - imperative way
+### create service node port - imperative way
 
 ```
 PS D:\GitHub\kicaj29\Kubernetes> kubectl expose pod hello-pod --name=hello-svc --target-port=8080 --type=NodePort
@@ -674,7 +675,46 @@ NAME                                                 TYPE           CLUSTER-IP  
 hello-svc                                            NodePort       10.98.145.38     <none>        8080:30630/TCP               107s
 ```
 
-Next we can see the app working in local cluster by opening http://localhost:30630
+Next we can see the app working in local cluster by opening http://localhost:30630   
+
+Next we can delete the service:
+
+```
+PS D:\GitHub\kicaj29\Kubernetes> kubectl delete svc hello-svc
+service "hello-svc" deleted
+```
+
+### create service node port - declarative way
+
+[svc-nodeport](./another-nodejs-example/Services/svc-nodeport.yml)
+
+```
+PS D:\GitHub\kicaj29\Kubernetes> kubectl get pod hello-pod --show-labels
+NAME        READY   STATUS    RESTARTS   AGE   LABELS
+hello-pod   1/1     Running   0          16h   app=web
+PS D:\GitHub\kicaj29\Kubernetes> cd .\another-nodejs-example\Services\
+PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Services> kubectl apply -f svc-nodeport.yml
+service/ps-nodeport created
+PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Services> kubectl describe svc ps-nodeport
+Name:                     ps-nodeport
+Namespace:                default
+Labels:                   <none>
+Annotations:              kubectl.kubernetes.io/last-applied-configuration:
+                            {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"ps-nodeport","namespace":"default"},"spec":{"ports":[{"nodePort":...
+Selector:                 app=web
+Type:                     NodePort
+IP:                       10.105.44.160
+LoadBalancer Ingress:     localhost
+Port:                     <unset>  80/TCP
+TargetPort:               8080/TCP
+NodePort:                 <unset>  31111/TCP
+Endpoints:                10.1.1.194:8080
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+```
+
+Next we can open the app in local cluster: http://localhost:31111/
 
 # Kubernetes dashboard
 

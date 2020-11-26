@@ -1,14 +1,15 @@
+# service is part of the core that`s why we specify only version
 apiVersion: v1
 kind: Service
 metadata:
-  name: ps-nodeport
+  name: ps-nodeport # name of the service
 spec:
   type: NodePort
   ports:
   - port: 80
     targetPort: 8080
-    nodePort: 31111
-    protocol: TCP
+    nodePort: 31111 # must be in range: 30000-32767
+    protocol: TCP # default is TCP (could be skipped in this case)
   selector:
-    app: web
+    app: web # this is name from pod.yml: metadata/labels
     
