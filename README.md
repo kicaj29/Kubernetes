@@ -47,6 +47,9 @@
     - [create service node port - declarative way](#create-service-node-port---declarative-way)
     - [create Internet LoadBalancer service](#create-internet-loadbalancer-service)
     - [Deployments](#deployments-1)
+      - [Basic deployment](#basic-deployment)
+        - [Serivce endpoints - check pods which are available for the service](#serivce-endpoints---check-pods-which-are-available-for-the-service)
+      - [Advanced deployment](#advanced-deployment)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 - [other](#other)
@@ -728,8 +731,8 @@ Next we can open the app in local cluster: http://localhost:31111/
 
 ### Deployments
 
+#### Basic deployment
 [deploy](./another-nodejs-example/Deployments/deploy.yml)   
-[deploy-complete](./another-nodejs-example/Deployments/deploy-complete.yml)
 
 Deployment object is in apps api subgroup.   
 
@@ -770,6 +773,8 @@ web-deploy-7fcb7dfd6b-dj7jv                                1/1     Running   0  
 web-deploy-7fcb7dfd6b-g8pkf                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
 ```
 
+##### Serivce endpoints - check pods which are available for the service
+
 By checking endpoints object we can see list of healthy pods which are available for the service:
 ```
 PS D:\GitHub\kicaj29\Kubernetes> kubectl describe ep
@@ -787,6 +792,10 @@ Subsets:
 
 Events:  <none>
 ```
+
+#### Advanced deployment 
+
+[deploy-complete](./another-nodejs-example/Deployments/deploy-complete.yml)
 
 # Kubernetes dashboard
 
