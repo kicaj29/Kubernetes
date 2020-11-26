@@ -4,12 +4,13 @@ kind: Deployment
 metadata:
   name: web-deploy
   labels:
-    app: web
+    app: web # it has nothing to do with selection on Pods!
 spec:
-  replicas: 5
+  replicas: 5 # how many pods this deployment should create
   selector:
     matchLabels:
-      app: web
+      app: web # this is binding between deployment object and pods, thx to this K8s knows which pods should be upgraded or rolled back!
+               # usually this selector has to match labels in template section
   template:
     metadata:
       labels:
@@ -18,7 +19,10 @@ spec:
       terminationGracePeriodSeconds: 1
       containers:
       - name: hello-pod
-        image: nigelpoulton/getting-started-k8s:1.0
-        imagePullPolicy: Always
+        image: kicaj29/another-app:1.0
+        imagePullPolicy: Always # always pull images from the registry, any time a node runs a container it creates local copy of the image
+                                # it is good for development scenario to speed up things but it opens you up to malicious code. 
+                                # Anyone could have put an image locally on a node and given it this name that we're trying to use.
+                                # Using imagePullPolicy as Always is more secure.
         ports:
         - containerPort: 8080

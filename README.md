@@ -45,6 +45,8 @@
     - [create multi container pod manifest (YAML) and apply it](#create-multi-container-pod-manifest-yaml-and-apply-it)
     - [create service node port - imperative way](#create-service-node-port---imperative-way)
     - [create service node port - declarative way](#create-service-node-port---declarative-way)
+    - [create Internet LoadBalancer service](#create-internet-loadbalancer-service)
+    - [Deployments](#deployments-1)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 - [other](#other)
@@ -715,6 +717,43 @@ Events:                   <none>
 ```
 
 Next we can open the app in local cluster: http://localhost:31111/
+
+### create Internet LoadBalancer service
+
+[svc-lb](./another-nodejs-example/Services/svc-lb.yml)
+
+> **Only works on supported platforms and supported load balancers. Not available for docker desktop or minikube.**
+
+???Probably LB creates implicitelly also NodePort service types to have possiblity to communicate with nodes/pods.???
+
+### Deployments
+
+[deploy](./another-nodejs-example/Deployments/deploy.yml)   
+[deploy-complete](./another-nodejs-example/Deployments/deploy-complete.yml)
+
+Deployment object is in apps api subgroup.   
+
+Delete pod from previous chapters:
+```
+PS D:\GitHub\kicaj29\Kubernetes> kubectl delete pod hello-pod
+pod "hello-pod" deleted
+```
+
+Next steps:
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Deployments> kubectl apply -f deploy.yml
+deployment.apps/web-deploy created
+NAME                                                       READY   STATUS    RESTARTS   AGE   IP           NODE             NOMINATED NODE   READINESS GATES
+web-deploy-7fcb7dfd6b-486jq                                1/1     Running   0          24s   10.1.1.196   docker-desktop   <none>           <none>
+web-deploy-7fcb7dfd6b-7wgmb                                1/1     Running   0          24s   10.1.1.197   docker-desktop   <none>           <none>
+web-deploy-7fcb7dfd6b-b97c4                                1/1     Running   0          24s   10.1.1.198   docker-desktop   <none>           <none>
+web-deploy-7fcb7dfd6b-dj7jv                                1/1     Running   0          24s   10.1.1.199   docker-desktop   <none>           <none>
+web-deploy-7fcb7dfd6b-g8pkf                                1/1     Running   0          24s   10.1.1.195   docker-desktop   <none>           <none>
+PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Deployments> kubectl get deploy
+NAME                                       READY   UP-TO-DATE   AVAILABLE   AGE
+web-deploy                                 5/5     5            5           67s
+```
 
 # Kubernetes dashboard
 
