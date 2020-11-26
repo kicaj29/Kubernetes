@@ -49,7 +49,9 @@
     - [Deployments](#deployments-1)
       - [Basic deployment](#basic-deployment)
         - [Serivce endpoints - check pods which are available for the service](#serivce-endpoints---check-pods-which-are-available-for-the-service)
-      - [Advanced deployment](#advanced-deployment)
+      - [Rolling update](#rolling-update)
+        - [Create and publish second version of the image](#create-and-publish-second-version-of-the-image)
+      - [Execute update](#execute-update)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 - [other](#other)
@@ -793,9 +795,60 @@ Subsets:
 Events:  <none>
 ```
 
-#### Advanced deployment 
+#### Rolling update 
 
-[deploy-complete](./another-nodejs-example/Deployments/deploy-complete.yml)
+[Rolling update](./another-nodejs-example/Deployments/rolling-update.yml)
+
+First lest delete one of the pods:
+```
+PS D:\GitHub\kicaj29\Kubernetes> kubectl delete pod web-deploy-7fcb7dfd6b-486jq
+pod "web-deploy-7fcb7dfd6b-486jq" deleted
+```
+
+We can see that new pod is startup automatically and again we have 5 pods:
+
+```
+PS D:\GitHub\kicaj29\Kubernetes> kubectl get pods
+NAME                                                       READY   STATUS    RESTARTS   AGE
+web-deploy-7fcb7dfd6b-7wgmb                                1/1     Running   0          16m
+web-deploy-7fcb7dfd6b-b97c4                                1/1     Running   0          16m
+web-deploy-7fcb7dfd6b-dj7jv                                1/1     Running   0          16m
+web-deploy-7fcb7dfd6b-g8pkf                                1/1     Running   0          16m
+web-deploy-7fcb7dfd6b-q9m87                                1/1     Running   0          32s
+```
+
+
+Explanation of **maxUnavailable**, **maxSurge**, **minReadySeconds** from the [manifest file](./another-nodejs-example/Deployments/rolling-update.yml):   
+> Kubernetes will deploy one new pod on the new version taken us from 5 to 6 once that up and running for minReadySeconds (8). After that, it will terminate an old pod and takes back down to 5. Then it will fire up a new one taken us to 6 again. Wait for 8 seconds, delete an old one and it'll rinse and repeat that process until it cycles through all 5 pods.
+
+##### Create and publish second version of the image
+
+```
+docker image build -t kicaj29/another-app:2.0 .
+docker image push kicaj29/another-app:2.0
+```
+
+#### Execute update
+
+* in one console watch pods
+```
+kubectl get pods --watch
+```
+* in next console run update
+```
+kubectl apply -f rolling-update.yml
+```
+* in next console run monitoring of rollout (in this case it is update)
+```
+kubectl rollout status deploy web-deploy
+```
+* in next console check current status of replica sets
+```
+kubectl get rs
+```
+
+We can see that new pod is created and pod from previous version is deleted, this is repeated 5 times.
+![10-rolling-update.png](images/10-rolling-update.png)
 
 # Kubernetes dashboard
 
