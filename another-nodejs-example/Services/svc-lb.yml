@@ -10,4 +10,4 @@ spec:
   - port: 80
     targetPort: 8080
   selector:
-    app: web
+    app: web  # this is name from pod.yml: metadata/labels

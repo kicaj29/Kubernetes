@@ -8,6 +8,10 @@
   - [Nodeless Kubernetes](#nodeless-kubernetes)
 - [Pods](#pods)
 - [Services](#services)
+  - [Access from inside of the cluster](#access-from-inside-of-the-cluster)
+  - [Access from outside of the cluster - node port](#access-from-outside-of-the-cluster---node-port)
+  - [Access from outside of the cluster - load balancer](#access-from-outside-of-the-cluster---load-balancer)
+  - [Port types](#port-types)
 - [Deployments](#deployments)
 - [Persistent Volumes](#persistent-volumes)
 - [Virtual Kubelet](#virtual-kubelet)
@@ -34,12 +38,11 @@
     - [Scale pods manually](#scale-pods-manually)
     - [Update application in AKS cluster](#update-application-in-aks-cluster)
     - [Kubernetes dashboard AKS](#kubernetes-dashboard-aks)
-  - [another nodejs example](#another-nodejs-example)
+  - [another-app nodejs example](#another-app-nodejs-example)
     - [build another-app image](#build-another-app-image)
     - [publish another-app image to docker hub](#publish-another-app-image-to-docker-hub)
-    - [create pod manifest (YAML)](#create-pod-manifest-yaml)
-      - [apply pod manifest](#apply-pod-manifest)
-    - [create multi container pod manifest (YAML)](#create-multi-container-pod-manifest-yaml)
+    - [create pod manifest (YAML) and apply it](#create-pod-manifest-yaml-and-apply-it)
+    - [create multi container pod manifest (YAML) and apply it](#create-multi-container-pod-manifest-yaml-and-apply-it)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 - [other](#other)
@@ -127,6 +130,8 @@ To scale up/down Kubernetes control amount of pods and not containers inside pod
 
 # Services
 Services offers **fixed** IP address, DNS name and load balancing. It is needed because new pods get different IP addresses every time.
+Service can give access to pods for external and internal access.   
+**Every container in every pod can resolve service name!**
 
 **Pods are assigned to a service via labels.**
 
@@ -146,7 +151,29 @@ Other important points:
 
 ![multi-instances-in-diff-nodes](images/multi-instances-in-diff-nodes.png)
 
+Service types:
+* Cluster IP: gives you a service inside your cluster that other apps inside your cluster can access. There is no external access.
+* NodePort:  NodePort, as the name implies, opens a specific port on all the Nodes (the VMs), and any traffic that is sent to this port is forwarded to the service.
+* LoadBalancer: will give you a single IP address that will forward all traffic to your service.
+* Ingress: is actually NOT a type of service. Instead, it sits in front of multiple services and act as a “smart router” or entry point into your cluster.
+
 More can be found here: https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0
+
+## Access from inside of the cluster
+
+![07-internall-access](images/07-internall-access.png)
+
+## Access from outside of the cluster - node port
+
+![08-externall-access.png](images/08-externall-access.png)
+
+## Access from outside of the cluster - load balancer
+
+![09-externall-access-lb.png](images/09-externall-access-lb.png)
+
+## Port types
+
+![port-types](images/port-types.png)
 
 # Deployments
 Deployments are described via YAML or JSON manifest file. They are deployed via *apiserver* from master.
@@ -366,9 +393,6 @@ Next we have to create a kubernetes service that will make possible connecting t
 
 Because we are in local (single node) kubernetes cluster we cannot use **LoadBalancer** type and we have to use **NodePort**.
 
-Port types:
-![port-types](images/port-types.png)
-
 ```
 kubectl expose deployment letskube-deployment --type=NodePort
 ```
@@ -583,7 +607,7 @@ kubectl set image deployment letskube-deployment letskube=letskubeacrjacek.azure
 az aks browse -g letskuberg-jacek -n letskubeaksclusterjacek
 ```
 
-## another nodejs example
+## another-app nodejs example
 
 [another nodejs example](./another-nodejs-example)
 
@@ -608,11 +632,9 @@ c447987a5233: Mounted from library/node
 1.0: digest: sha256:1fe46dc33b6442ebbe5700c94891b267c59de772709c62760db62d5a861d3668 size: 1787
 ```
 
-### create pod manifest (YAML)
+### create pod manifest (YAML) and apply it
 
 [pod manifest](./another-nodejs-example/Pods/pod.yml)
-
-#### apply pod manifest
 
 ```
 PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl apply -f pod.yml
@@ -627,7 +649,7 @@ To get full description for the pod run:
 kubectl describe pods hello-pod
 ```
 
-### create multi container pod manifest (YAML)
+### create multi container pod manifest (YAML) and apply it
 
 [multi container pod manifest](./another-nodejs-example/Pods/multi-pod.yml)
 
