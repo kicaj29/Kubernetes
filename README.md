@@ -51,7 +51,8 @@
         - [Serivce endpoints - check pods which are available for the service](#serivce-endpoints---check-pods-which-are-available-for-the-service)
       - [Rolling update](#rolling-update)
         - [Create and publish second version of the image](#create-and-publish-second-version-of-the-image)
-      - [Execute update](#execute-update)
+        - [Execute update](#execute-update)
+        - [Execute rollback - use previous replica set](#execute-rollback---use-previous-replica-set)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 - [other](#other)
@@ -828,7 +829,7 @@ docker image build -t kicaj29/another-app:2.0 .
 docker image push kicaj29/another-app:2.0
 ```
 
-#### Execute update
+##### Execute update
 
 * in one console watch pods
 ```
@@ -849,6 +850,91 @@ kubectl get rs
 
 We can see that new pod is created and pod from previous version is deleted, this is repeated 5 times.
 ![10-rolling-update.png](images/10-rolling-update.png)
+
+After this we can see that new replica set was created where desired and current state are the same and equal 5.
+```
+PS D:\> kubectl get rs
+NAME                    DESIRED   CURRENT   READY   AGE
+web-deploy-7fcb7dfd6b   5         5         5       3h24m
+PS D:\> kubectl get rs
+NAME                    DESIRED   CURRENT   READY   AGE
+web-deploy-7444c66bbf   5         5         5       5m37s
+web-deploy-7fcb7dfd6b   0         0         0       3h31m
+PS D:\>
+```
+
+##### Execute rollback - use previous replica set
+
+Previous replica set can be used to do rollback. Frist we can check how looks previous replica set:
+
+```
+S D:\GitHub\kicaj29\Kubernetes> kubectl describe rs web-deploy-7fcb7dfd6b
+Name:           web-deploy-7fcb7dfd6b
+Namespace:      default
+Selector:       app=web,pod-template-hash=7fcb7dfd6b
+Labels:         app=web
+                pod-template-hash=7fcb7dfd6b
+Annotations:    deployment.kubernetes.io/desired-replicas: 5
+                deployment.kubernetes.io/max-replicas: 6
+                deployment.kubernetes.io/revision: 1
+Controlled By:  Deployment/web-deploy
+Replicas:       0 current / 0 desired
+Pods Status:    0 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=web
+           pod-template-hash=7fcb7dfd6b
+  Containers:
+   hello-pod:
+    Image:        kicaj29/another-app:1.0
+    Port:         8080/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Events:
+  Type    Reason            Age    From                   Message
+  ----    ------            ----   ----                   -------
+  Normal  SuccessfulDelete  8m24s  replicaset-controller  Deleted pod: web-deploy-7fcb7dfd6b-q9m87
+  Normal  SuccessfulDelete  8m13s  replicaset-controller  Deleted pod: web-deploy-7fcb7dfd6b-dj7jv
+  Normal  SuccessfulDelete  8m1s   replicaset-controller  Deleted pod: web-deploy-7fcb7dfd6b-7wgmb
+  Normal  SuccessfulDelete  7m50s  replicaset-controller  Deleted pod: web-deploy-7fcb7dfd6b-b97c4
+  Normal  SuccessfulDelete  7m39s  replicaset-controller  Deleted pod: web-deploy-7fcb7dfd6b-g8pkf
+```
+
+Check also history of rollouts:
+
+```
+S D:\GitHub\kicaj29\Kubernetes> kubectl rollout history deploy web-deploy
+deployment.apps/web-deploy
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+```
+
+Next we can do rollback:
+
+```
+kubectl rollout undo deploy web-deploy --to-revision=1
+```
+
+It will run similar proccess of creating and deleting pods like in case of update.
+
+![11-rollback.png](images/11-rollback.png)
+
+When it is done we can check status of the replica sets and rollout history. We can see that now again the first replica set ```web-deploy-7fcb7dfd6b``` is up and running.
+
+```
+PS D:\> kubectl rollout history deploy web-deploy
+deployment.apps/web-deploy
+REVISION  CHANGE-CAUSE
+2         <none>
+3         <none>
+
+PS D:\> kubectl get rs
+NAME                    DESIRED   CURRENT   READY   AGE
+web-deploy-7444c66bbf   0         0         0       16m
+web-deploy-7fcb7dfd6b   5         5         5       3h41m
+```
 
 # Kubernetes dashboard
 
