@@ -43,6 +43,7 @@
     - [publish another-app image to docker hub](#publish-another-app-image-to-docker-hub)
     - [create pod manifest (YAML) and apply it](#create-pod-manifest-yaml-and-apply-it)
     - [create multi container pod manifest (YAML) and apply it](#create-multi-container-pod-manifest-yaml-and-apply-it)
+    - [create service - imperative way](#create-service---imperative-way)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 - [other](#other)
@@ -662,6 +663,18 @@ multi-container-pod   2/2     Running   0          21s   10.1.1.176   docker-des
 PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl delete pod multi-container-pod
 pod "multi-container-pod" deleted
 ```
+
+### create service - imperative way
+
+```
+PS D:\GitHub\kicaj29\Kubernetes> kubectl expose pod hello-pod --name=hello-svc --target-port=8080 --type=NodePort
+service/hello-svc exposed
+PS D:\GitHub\kicaj29\Kubernetes> kubectl get svc
+NAME                                                 TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+hello-svc                                            NodePort       10.98.145.38     <none>        8080:30630/TCP               107s
+```
+
+Next we can see the app working in local cluster by opening http://localhost:30630
 
 # Kubernetes dashboard
 
