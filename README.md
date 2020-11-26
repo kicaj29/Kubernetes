@@ -753,6 +753,39 @@ web-deploy-7fcb7dfd6b-g8pkf                                1/1     Running   0  
 PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Deployments> kubectl get deploy
 NAME                                       READY   UP-TO-DATE   AVAILABLE   AGE
 web-deploy                                 5/5     5            5           67s
+PS D:\GitHub\kicaj29\Kubernetes> kubectl get rs
+NAME                                                 DESIRED   CURRENT   READY   AGE
+web-deploy-7fcb7dfd6b                                5         5         5       2m37s
+```
+
+Because we have running service from previous chapters ```ps-nodeport``` we can open ```http://localhost:31111/```
+
+```
+PS D:\GitHub\kicaj29\Kubernetes> kubectl get pods --show-labels
+NAME                                                       READY   STATUS    RESTARTS   AGE     LABELS
+web-deploy-7fcb7dfd6b-486jq                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
+web-deploy-7fcb7dfd6b-7wgmb                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
+web-deploy-7fcb7dfd6b-b97c4                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
+web-deploy-7fcb7dfd6b-dj7jv                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
+web-deploy-7fcb7dfd6b-g8pkf                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
+```
+
+By checking endpoints object we can see list of healthy pods which are available for the service:
+```
+PS D:\GitHub\kicaj29\Kubernetes> kubectl describe ep
+Name:         ps-nodeport
+Namespace:    default
+Labels:       <none>
+Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2020-11-26T08:12:34Z
+Subsets:
+  Addresses:          10.1.1.195,10.1.1.196,10.1.1.197,10.1.1.198,10.1.1.199
+  NotReadyAddresses:  <none>
+  Ports:
+    Name     Port  Protocol
+    ----     ----  --------
+    <unset>  8080  TCP
+
+Events:  <none>
 ```
 
 # Kubernetes dashboard
