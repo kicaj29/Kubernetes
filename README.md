@@ -55,7 +55,7 @@
         - [Execute rollback - use previous replica set](#execute-rollback---use-previous-replica-set)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
-- [other](#other)
+- [kubectl config](#kubectl-config)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -970,7 +970,10 @@ https://app.pluralsight.com/library/courses/kubernetes-getting-started/table-of-
 
 Another good example is in my repo with helm: https://github.com/kicaj29/helm
 
-# other 
-az account set --subscription "RSW Continuous Delivery" 
-az aks get-credentials --resource-group rsw.deployment.common --name rsw-kubernetes
-kubectl config get-contexts 
+# kubectl config
+```
+kubectl config get-contexts
+```
+```
+kubectl config use-context CONTEXT_NAME
+```
