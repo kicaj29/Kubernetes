@@ -18,6 +18,7 @@
 - [Installation](#installation)
   - [ways to run Kubernetes](#ways-to-run-kubernetes)
   - [kubectl](#kubectl)
+    - [kubectl config](#kubectl-config)
   - [Minikube](#minikube)
     - [structure](#structure)
     - [Install Minikube on Ubuntu 18.04](#install-minikube-on-ubuntu-1804)
@@ -55,7 +56,6 @@
         - [Execute rollback - use previous replica set](#execute-rollback---use-previous-replica-set)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
-- [kubectl config](#kubectl-config)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -219,6 +219,14 @@ The Kubernetes command-line tool, **kubectl**, allows you to run commands agains
 >Docker Desktop for Windows adds its own version of kubectl to PATH. If you have installed Docker Desktop before, you may need to place your PATH entry before the one added by the Docker Desktop installer or remove the Docker Desktop’s kubectl.
 
 ![kubectl-version](images/kubectl-version.png)
+
+### kubectl config
+```
+kubectl config get-contexts
+```
+```
+kubectl config use-context CONTEXT_NAME
+```
 
 ## Minikube
 
@@ -969,11 +977,3 @@ https://app.pluralsight.com/library/courses/kubernetes-developers-moving-cloud/t
 https://app.pluralsight.com/library/courses/kubernetes-getting-started/table-of-contents   
 
 Another good example is in my repo with helm: https://github.com/kicaj29/helm
-
-# kubectl config
-```
-kubectl config get-contexts
-```
-```
-kubectl config use-context CONTEXT_NAME
-```
