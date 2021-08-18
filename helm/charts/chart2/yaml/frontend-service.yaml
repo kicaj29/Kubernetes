@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: frontend
+  name: frontend
+spec:
+  type: NodePort
+  ports:
+      # port of the service
+    - port: 80
+      # By default and for convenience, the `targetPort` is set to the same value as the `port` field (it is port of pod)
+      targetPort: 4200
+      # By default and for convenience, the Kubernetes control plane will allocate a port from a range (default: 30000-32767)
+      nodePort: 30007
+  selector:
+    app: frontend
