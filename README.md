@@ -36,9 +36,9 @@
     - [Pod object](#pod-object)
       - [create pod manifest (YAML) and apply it](#create-pod-manifest-yaml-and-apply-it)
       - [create multi container pod manifest (YAML) and apply it](#create-multi-container-pod-manifest-yaml-and-apply-it)
-      - [Service object with type node port - imperative way](#service-object-with-type-node-port---imperative-way)
-      - [Service object with type node port - declarative way](#service-object-with-type-node-port---declarative-way)
-      - [create Internet LoadBalancer service](#create-internet-loadbalancer-service)
+      - [Service object with type NodePort - imperative way](#service-object-with-type-nodeport---imperative-way)
+      - [Service object with type NodePort - declarative way](#service-object-with-type-nodeport---declarative-way)
+      - [Service object with type LoadBalancer](#service-object-with-type-loadbalancer)
     - [Deployments](#deployments-1)
       - [Basic deployment](#basic-deployment)
         - [Serivce endpoints - check pods which are available for the service](#serivce-endpoints---check-pods-which-are-available-for-the-service)
@@ -389,7 +389,7 @@ PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl d
 pod "multi-container-pod" deleted
 ```
 
-#### Service object with type node port - imperative way
+#### Service object with type NodePort - imperative way
 
 To have access to the hosted app we have to create `Service` object with `NodePort`.
 
@@ -420,7 +420,7 @@ PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl d
 pod "hello-pod" deleted
 ```
 
-#### Service object with type node port - declarative way
+#### Service object with type NodePort - declarative way
 
 [svc-nodeport](./example01-deploy-update-rollback/Services/svc-nodeport.yml)
 
@@ -466,13 +466,51 @@ ps-nodeport   NodePort    10.110.74.12   <none>        80:31111/TCP   78s
 
 Next we can open the app in local cluster: http://localhost:31111/
 
-#### create Internet LoadBalancer service
+Clean up:
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services> kubectl delete svc ps-nodeport
+service "ps-nodeport" deleted
+```
 
-[svc-lb](./another-nodejs-example/Services/svc-lb.yml)
+#### Service object with type LoadBalancer
 
-> **Only works on supported platforms and supported load balancers. Not available for docker desktop or minikube.**
+[svc-lb](./example01-deploy-update-rollback/Services/svc-lb.yml)
 
-???Probably LB creates implicitelly also NodePort service types to have possiblity to communicate with nodes/pods.???
+This service type makes sense only when we have multiple nodes (typically in public cloud providers). Then user will get single IP and port to access hosted app.   
+
+It is also possible to create this service type on local cluster with single node but then it works very similar to NodePort type.
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services> kubectl apply -f svc-lb.yml
+service/ps-lb created
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services> kubectl describe svc ps-lb
+Name:                     ps-lb
+Namespace:                default
+Labels:                   <none>
+Annotations:              <none>
+Selector:                 app=web
+Type:                     LoadBalancer
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.103.89.52
+IPs:                      10.103.89.52
+LoadBalancer Ingress:     localhost
+Port:                     <unset>  82/TCP
+TargetPort:               8080/TCP
+NodePort:                 <unset>  30593/TCP
+Endpoints:                10.1.0.12:8080
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services> kubectl get svc
+NAME         TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP      10.96.0.1      <none>        443/TCP        7d23h
+ps-lb        LoadBalancer   10.103.89.52   localhost     82:30593/TCP   3m44s
+```
+
+The app can be accessed using address http://localhost:82/.
+
+NOTE: I would expect that the will be available also using node port value http://localhost:30593/ but it is not, maybe it is somehow blocked by created services.
 
 ### Deployments
 
