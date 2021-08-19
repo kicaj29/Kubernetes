@@ -7,6 +7,7 @@
   - [Kube-proxy](#kube-proxy)
   - [Nodeless Kubernetes](#nodeless-kubernetes)
 - [Pods](#pods)
+- [ReplicaSet](#replicaset)
 - [Services](#services)
   - [Access from inside of the cluster](#access-from-inside-of-the-cluster)
   - [Access from outside of the cluster - node port](#access-from-outside-of-the-cluster---node-port)
@@ -29,7 +30,7 @@
   - [K8s from docker desktop](#k8s-from-docker-desktop)
 - [kubectl apply vs create](#kubectl-apply-vs-create)
 - [Examples](#examples)
-  - [Example 01: deploy and update](#example-01-deploy-and-update)
+  - [Example 01: deploy, update, and rollback](#example-01-deploy-update-and-rollback)
     - [build another-app image](#build-another-app-image)
     - [publish another-app image to docker hub](#publish-another-app-image-to-docker-hub)
     - [create pod manifest (YAML) and apply it](#create-pod-manifest-yaml-and-apply-it)
@@ -127,6 +128,11 @@ To scale up/down Kubernetes control amount of pods and not containers inside pod
 ![pods-scaling](images/pods-scaling.png)
 
 **Pods do not support resurrection. Every time new pod is set up it is completely new pod.** It means also that pods do not have fixed IP addresses - that`s why concept of services and labels was introduced.
+
+# ReplicaSet
+
+> "A ReplicaSet's purpose is to maintain a stable set of replica Pods running at any given time. As such, it is often used to guarantee the availability of a specified number of identical Pods."
+
 
 # Services
 Services offers **fixed** IP address, DNS name and load balancing. It is needed because new pods get different IP addresses every time.
@@ -309,7 +315,7 @@ https://kubernetes.io/docs/tasks/manage-kubernetes-objects/declarative-config/
 
 # Examples
 
-## Example 01: deploy and update
+## Example 01: deploy, update, and rollback
 
 [another nodejs example](./another-nodejs-example)
 
