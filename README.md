@@ -512,6 +512,15 @@ The app can be accessed using address http://localhost:82/.
 
 NOTE: I would expect that the will be available also using node port value http://localhost:30593/ but it is not, maybe it is somehow blocked by created services.
 
+
+Cleanup:
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services> kubectl delete svc ps-lb
+service "ps-lb" deleted
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services> kubectl delete pod hello-pod
+pod "hello-pod" deleted
+```
+
 ### Deployments
 
 #### Basic deployment
