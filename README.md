@@ -35,10 +35,10 @@
     - [publish docker image to docker hub](#publish-docker-image-to-docker-hub)
     - [Pod object](#pod-object)
       - [create pod manifest (YAML) and apply it](#create-pod-manifest-yaml-and-apply-it)
-    - [create multi container pod manifest (YAML) and apply it](#create-multi-container-pod-manifest-yaml-and-apply-it)
-    - [create service node port - imperative way](#create-service-node-port---imperative-way)
-    - [create service node port - declarative way](#create-service-node-port---declarative-way)
-    - [create Internet LoadBalancer service](#create-internet-loadbalancer-service)
+      - [create multi container pod manifest (YAML) and apply it](#create-multi-container-pod-manifest-yaml-and-apply-it)
+      - [Service object with type node port - imperative way](#service-object-with-type-node-port---imperative-way)
+      - [Service object with type node port - declarative way](#service-object-with-type-node-port---declarative-way)
+      - [create Internet LoadBalancer service](#create-internet-loadbalancer-service)
     - [Deployments](#deployments-1)
       - [Basic deployment](#basic-deployment)
         - [Serivce endpoints - check pods which are available for the service](#serivce-endpoints---check-pods-which-are-available-for-the-service)
@@ -375,72 +375,98 @@ PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl g
 No resources found in default namespace.
 ```
 
-### create multi container pod manifest (YAML) and apply it
+#### create multi container pod manifest (YAML) and apply it
 
-[multi container pod manifest](./another-nodejs-example/Pods/multi-pod.yml)
+[multi container pod manifest](./example01-deploy-update-rollback/Pods/multi-pod.yml)
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl apply -f multi-pod.yml
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl apply -f multi-pod.yml
 pod/multi-container-pod created
-S D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl get pod multi-container-pod -o wide
+S D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl get pod multi-container-pod -o wide
 NAME                  READY   STATUS    RESTARTS   AGE   IP           NODE             NOMINATED NODE   READINESS GATES
 multi-container-pod   2/2     Running   0          21s   10.1.1.176   docker-desktop   <none>           <none>
-PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl delete pod multi-container-pod
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl delete pod multi-container-pod
 pod "multi-container-pod" deleted
 ```
 
-### create service node port - imperative way
+#### Service object with type node port - imperative way
+
+To have access to the hosted app we have to create `Service` object with `NodePort`.
+
+First create a pod:
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes> kubectl expose pod hello-pod --name=hello-svc --target-port=8080 --type=NodePort
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl apply -f pod.yml
+pod/hello-pod created
+```
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl expose pod hello-pod --name=hello-svc --target-port=8080 --type=NodePort
 service/hello-svc exposed
-PS D:\GitHub\kicaj29\Kubernetes> kubectl get svc
-NAME                                                 TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
-hello-svc                                            NodePort       10.98.145.38     <none>        8080:30630/TCP               107s
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl get svc
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+hello-svc    NodePort    10.105.83.145   <none>        8080:32083/TCP   24s
+kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP          7d22h
 ```
 
-Next we can see the app working in local cluster by opening http://localhost:30630   
+Next we can see the app is available on port 32083 and can bo opened using url http://localhost:32083
 
-Next we can delete the service:
+Next we can delete the service and pod:
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes> kubectl delete svc hello-svc
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl delete svc hello-svc
 service "hello-svc" deleted
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl delete pod hello-pod
+pod "hello-pod" deleted
 ```
 
-### create service node port - declarative way
+#### Service object with type node port - declarative way
 
-[svc-nodeport](./another-nodejs-example/Services/svc-nodeport.yml)
+[svc-nodeport](./example01-deploy-update-rollback/Services/svc-nodeport.yml)
+
+Create a pod and check if it is running:
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes> kubectl get pod hello-pod --show-labels
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl apply -f pod.yml
+pod/hello-pod created
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl get pod hello-pod --show-labels
 NAME        READY   STATUS    RESTARTS   AGE   LABELS
-hello-pod   1/1     Running   0          16h   app=web
-PS D:\GitHub\kicaj29\Kubernetes> cd .\another-nodejs-example\Services\
-PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Services> kubectl apply -f svc-nodeport.yml
+hello-pod   1/1     Running   0          13s   app=web
+```
+
+Next create service and check if it is running:
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services> kubectl apply -f svc-nodeport.yml
 service/ps-nodeport created
-PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Services> kubectl describe svc ps-nodeport
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services> kubectl describe svc ps-nodeport
 Name:                     ps-nodeport
 Namespace:                default
 Labels:                   <none>
-Annotations:              kubectl.kubernetes.io/last-applied-configuration:
-                            {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"ps-nodeport","namespace":"default"},"spec":{"ports":[{"nodePort":...
+Annotations:              <none>
 Selector:                 app=web
 Type:                     NodePort
-IP:                       10.105.44.160
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.110.74.12
+IPs:                      10.110.74.12
 LoadBalancer Ingress:     localhost
 Port:                     <unset>  80/TCP
 TargetPort:               8080/TCP
 NodePort:                 <unset>  31111/TCP
-Endpoints:                10.1.1.194:8080
+Endpoints:                10.1.0.12:8080
 Session Affinity:         None
 External Traffic Policy:  Cluster
 Events:                   <none>
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services> kubectl get svc
+NAME          TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kubernetes    ClusterIP   10.96.0.1      <none>        443/TCP        7d22h
+ps-nodeport   NodePort    10.110.74.12   <none>        80:31111/TCP   78s
 ```
 
 Next we can open the app in local cluster: http://localhost:31111/
 
-### create Internet LoadBalancer service
+#### create Internet LoadBalancer service
 
 [svc-lb](./another-nodejs-example/Services/svc-lb.yml)
 
