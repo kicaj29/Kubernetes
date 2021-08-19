@@ -32,6 +32,13 @@ namespace health_check_aspnet_core
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "health_check_aspnet_core", Version = "v1" });
             });
+
+
+            //services.AddHealthChecks();
+            services.AddHealthChecks()
+                .AddCheck<ExampleHealthCheck>(
+                    "example health check"                    
+                );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,6 +60,9 @@ namespace health_check_aspnet_core
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                endpoints.MapHealthChecks("/health");
+                // call GET https://localhost:5001/health to see in response "Healthy"
             });
         }
     }
