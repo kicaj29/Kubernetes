@@ -25,8 +25,6 @@
     - [Install Minikube on Ubuntu 18.04](#install-minikube-on-ubuntu-1804)
     - [installation on Win10](#installation-on-win10)
     - [running](#running)
-  - [Google Container Engine (GKE)](#google-container-engine-gke)
-  - [Azure Kubernetes Service (AKS)](#azure-kubernetes-service-aks)
   - [K8s from docker desktop](#k8s-from-docker-desktop)
 - [kubectl apply vs create](#kubectl-apply-vs-create)
 - [Examples](#examples)
@@ -287,16 +285,11 @@ choco install minikube
 
 ### running
 
-There is prerequist to create virtual swith in hyper-vthere is prerequisite to create virtual switch in hyper-v.
+There is prerequisite to create virtual switch in hyper-v.
 https://github.com/kubernetes/minikube/issues/2181#issuecomment-344183665
 
 ![hyperv-minikube-switch](images/hyperv-minikube-switch.png)
 
-## Google Container Engine (GKE)
-GKE is Kubernetes in Google Cloud.
-
-## Azure Kubernetes Service (AKS)
-AKS is Kubernetes in Azure.
 
 ## K8s from docker desktop
 
