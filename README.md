@@ -41,6 +41,7 @@
       - [Service object with type LoadBalancer](#service-object-with-type-loadbalancer)
     - [Deployment object](#deployment-object)
       - [Simple deployment](#simple-deployment)
+      - [ReplicaSet usage](#replicaset-usage)
       - [Rolling update](#rolling-update)
         - [Create and publish second version of the image](#create-and-publish-second-version-of-the-image)
         - [Execute update](#execute-update)
@@ -604,30 +605,32 @@ Subsets:
 
 Events:  <none>
 ```
+
+#### ReplicaSet usage
+
+Lets delete one of the pods:
+```
+kubectl delete pod web-deploy-58d76756b7-5wmnd
+pod "web-deploy-58d76756b7-5wmnd" deleted
+```
+
+We can see that thx to the `ReplicaSet` object a new pod is startup automatically and again we have 5 pods:
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl get pods
+NAME                          READY   STATUS    RESTARTS   AGE
+web-deploy-58d76756b7-6j7mt   1/1     Running   0          10m
+web-deploy-58d76756b7-826lp   1/1     Running   0          10m
+web-deploy-58d76756b7-gg7hx   1/1     Running   0          10m
+web-deploy-58d76756b7-v6mdd   1/1     Running   0          10s
+web-deploy-58d76756b7-wx4rs   1/1     Running   0          10m
+```
+
 #### Rolling update 
 
-[Rolling update](./another-nodejs-example/Deployments/rolling-update.yml)
-
-First lest delete one of the pods:
-```
-PS D:\GitHub\kicaj29\Kubernetes> kubectl delete pod web-deploy-7fcb7dfd6b-486jq
-pod "web-deploy-7fcb7dfd6b-486jq" deleted
-```
-
-We can see that new pod is startup automatically and again we have 5 pods:
-
-```
-PS D:\GitHub\kicaj29\Kubernetes> kubectl get pods
-NAME                                                       READY   STATUS    RESTARTS   AGE
-web-deploy-7fcb7dfd6b-7wgmb                                1/1     Running   0          16m
-web-deploy-7fcb7dfd6b-b97c4                                1/1     Running   0          16m
-web-deploy-7fcb7dfd6b-dj7jv                                1/1     Running   0          16m
-web-deploy-7fcb7dfd6b-g8pkf                                1/1     Running   0          16m
-web-deploy-7fcb7dfd6b-q9m87                                1/1     Running   0          32s
-```
+[Rolling update](./example01-deploy-update-rollback/Deployments/rolling-update.yml)
 
 
-Explanation of **maxUnavailable**, **maxSurge**, **minReadySeconds** from the [manifest file](./another-nodejs-example/Deployments/rolling-update.yml):   
+Explanation of **maxUnavailable**, **maxSurge**, **minReadySeconds** from the [manifest file](./example01-deploy-update-rollback/Deployments/rolling-update.yml):   
 > Kubernetes will deploy one new pod on the new version taken us from 5 to 6 once that up and running for minReadySeconds (8). After that, it will terminate an old pod and takes back down to 5. Then it will fire up a new one taken us to 6 again. Wait for 8 seconds, delete an old one and it'll rinse and repeat that process until it cycles through all 5 pods.
 
 ##### Create and publish second version of the image
@@ -737,6 +740,8 @@ deployment.apps/web-deploy
 REVISION  CHANGE-CAUSE
 2         <none>
 3         <none>
+
+>NOTE: it is odd but it looks that by default on local K8s only last 2 revisions are stored. Another option is that maybe K8s detected that it was rollback and in practice we still have only to version: old and new - so maybe it is some kind optimization to store less data - TBD.
 
 PS D:\> kubectl get rs
 NAME                    DESIRED   CURRENT   READY   AGE
