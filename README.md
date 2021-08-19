@@ -46,8 +46,8 @@
         - [Create and publish second version of the image](#create-and-publish-second-version-of-the-image)
         - [Execute update](#execute-update)
         - [Execute rollback - use previous replica set](#execute-rollback---use-previous-replica-set)
-- [Kubernetes dashboard](#kubernetes-dashboard)
         - [Removing deployment](#removing-deployment)
+- [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
@@ -750,6 +750,32 @@ web-deploy-7444c66bbf   0         0         0       16m
 web-deploy-7fcb7dfd6b   5         5         5       3h41m
 ```
 
+##### Removing deployment
+
+If we remove deployment all objects created by this deployment are deleted also:
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl get deployments
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+web-deploy   5/5     5            5           30m
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl delete deployment web-deploy
+deployment.apps "web-deploy" deleted
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl get rs
+No resources found in default namespace.
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl get pods
+No resources found in default namespace.
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl rollout history deploy web-deploy
+
+Error from server (NotFound): deployments.apps "web-deploy" not found
+```
+
+`Service` object was not created by `Deployment` object so it has to be deleted manually:
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl delete svc ps-nodeport
+service "ps-nodeport" deleted
+```
+
 # Kubernetes dashboard
 
 ```
@@ -770,35 +796,6 @@ kubectl -n kubernetes-dashboard describe secret [TOKEN]
 ![get-token](images/get-token.png)
 
 Next paste value from red rectangle to input for from the dashboard web UI.
-
-##### Removing deployment
-
-If we remove deployment all objects created by this deployment are deleted also:
-
-```
-PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl get deployments
-NAME         READY   UP-TO-DATE   AVAILABLE   AGE
-web-deploy   5/5     5            5           30m
-PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl delete deployment web-deploy
-deployment.apps "web-deploy" deleted
-PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl get rs
-No resources found in default namespace.
-PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl get pods
-No resources found in default namespace.
-PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl rollout history deploy web-deploy
-
-Error from server (NotFound): deployments.apps "web-deploy" not found
-```
-
-Deleting service:
-```
-PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl delete svc ps-nodeport
-service "ps-nodeport" deleted
-```
-
-`Service` object was not created by `Deployment` object so it has to be deleted manually:
-
-
 
 # resources
 https://app.pluralsight.com/library/courses/getting-started-kubernetes    
