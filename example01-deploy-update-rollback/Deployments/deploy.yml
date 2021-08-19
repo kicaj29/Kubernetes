@@ -1,20 +1,21 @@
-# Simple deployment used to deploy and manage the app in nigelpoulton/getting-started-k8s:1.0
 apiVersion: apps/v1
-kind: Deployment
+kind: Deployment                # 'Deployment' object will be created
 metadata:
   name: web-deploy
   labels:
-    app: web # it has nothing to do with selection on Pods!
+    app: web                    # this label causes the created `Deployment` object will manage `ReplicaSet` object which has label `app: web`
+                                # and all all nodes that have label `app: web`
+                                # it is needed because during update a new `ReplicaSet` object is created and old pods mut be deleted
 spec:
-  replicas: 5 # how many pods this deployment should create
+  replicas: 5                   # how many pods this deployment should create ( created `ReplicaSet` object will be responsible for it)
   selector:
     matchLabels:
-      app: web # this is binding between deployment object and pods, thx to this K8s knows which pods should be upgraded or rolled back!
-               # usually this selector has to match labels in template section
+      app: web                  # this label specifies that created `ReplicaSet` should manage all pods that have label `app: web`
+                                # additionally it causes also that created `ReplicaSet` will have label `app: web`
   template:
     metadata:
       labels:
-        app: web
+        app: web                # this label will be assigned to all pods created by this deployment
     spec: 
       terminationGracePeriodSeconds: 1
       containers:
@@ -25,4 +26,4 @@ spec:
                                 # Anyone could have put an image locally on a node and given it this name that we're trying to use.
                                 # Using imagePullPolicy as Always is more secure.
         ports:
-        - containerPort: 8080
+        - containerPort: 8080   # containerPort has to match port set in dockerfile 'EXPOSE 8080'

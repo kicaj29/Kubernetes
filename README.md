@@ -39,9 +39,8 @@
       - [Service object with type NodePort - imperative way](#service-object-with-type-nodeport---imperative-way)
       - [Service object with type NodePort - declarative way](#service-object-with-type-nodeport---declarative-way)
       - [Service object with type LoadBalancer](#service-object-with-type-loadbalancer)
-    - [Deployments](#deployments-1)
-      - [Basic deployment](#basic-deployment)
-        - [Serivce endpoints - check pods which are available for the service](#serivce-endpoints---check-pods-which-are-available-for-the-service)
+    - [Deployment object](#deployment-object)
+      - [Simple deployment](#simple-deployment)
       - [Rolling update](#rolling-update)
         - [Create and publish second version of the image](#create-and-publish-second-version-of-the-image)
         - [Execute update](#execute-update)
@@ -521,61 +520,82 @@ PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services> kubec
 pod "hello-pod" deleted
 ```
 
-### Deployments
+### Deployment object
 
-#### Basic deployment
-[deploy](./another-nodejs-example/Deployments/deploy.yml)   
+Deployment object combines `Pod`, `ReplicaSet`, and `Deployment` objects.   
+Deployment object is in apps api subgroup.
 
-Deployment object is in apps api subgroup.   
+![deployment-objects](./images/20-deployment.png)
 
-Delete pod from previous chapters:
+#### Simple deployment
+[deploy](./example01-deploy-update-rollback/Deployments/deploy.yml)   
+
+Create deployment:
 ```
-PS D:\GitHub\kicaj29\Kubernetes> kubectl delete pod hello-pod
-pod "hello-pod" deleted
-```
-
-Next steps:
-
-```
-PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Deployments> kubectl apply -f deploy.yml
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl apply -f deploy.yml
 deployment.apps/web-deploy created
-NAME                                                       READY   STATUS    RESTARTS   AGE   IP           NODE             NOMINATED NODE   READINESS GATES
-web-deploy-7fcb7dfd6b-486jq                                1/1     Running   0          24s   10.1.1.196   docker-desktop   <none>           <none>
-web-deploy-7fcb7dfd6b-7wgmb                                1/1     Running   0          24s   10.1.1.197   docker-desktop   <none>           <none>
-web-deploy-7fcb7dfd6b-b97c4                                1/1     Running   0          24s   10.1.1.198   docker-desktop   <none>           <none>
-web-deploy-7fcb7dfd6b-dj7jv                                1/1     Running   0          24s   10.1.1.199   docker-desktop   <none>           <none>
-web-deploy-7fcb7dfd6b-g8pkf                                1/1     Running   0          24s   10.1.1.195   docker-desktop   <none>           <none>
-PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Deployments> kubectl get deploy
-NAME                                       READY   UP-TO-DATE   AVAILABLE   AGE
-web-deploy                                 5/5     5            5           67s
-PS D:\GitHub\kicaj29\Kubernetes> kubectl get rs
-NAME                                                 DESIRED   CURRENT   READY   AGE
-web-deploy-7fcb7dfd6b                                5         5         5       2m37s
+```
+Check deployment status:
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl get deploy --show-labels
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE    LABELS
+web-deploy   5/5     5            5           111s   app=web
+```
+Check created pods:
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl get pods --show-labels
+NAME                          READY   STATUS    RESTARTS   AGE   LABELS
+web-deploy-58d76756b7-5wmnd   1/1     Running   0          82s   app=web,pod-template-hash=58d76756b7
+web-deploy-58d76756b7-6j7mt   1/1     Running   0          82s   app=web,pod-template-hash=58d76756b7
+web-deploy-58d76756b7-826lp   1/1     Running   0          82s   app=web,pod-template-hash=58d76756b7
+web-deploy-58d76756b7-gg7hx   1/1     Running   0          82s   app=web,pod-template-hash=58d76756b7
+web-deploy-58d76756b7-wx4rs   1/1     Running   0          82s   app=web,pod-template-hash=58d76756b7
+```
+We can see also that `ReplicaSet` is created and has set label:
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl get rs --show-labels
+NAME                    DESIRED   CURRENT   READY   AGE     LABELS
+web-deploy-58d76756b7   5         5         5       2m32s   app=web,pod-template-hash=58d76756b7
 ```
 
-Because we have running service from previous chapters ```ps-nodeport``` we can open ```http://localhost:31111/```
+Now we can create `Service` object `NodePort` to have access to the app:
+```
+D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services>kubectl apply -f svc-nodeport.yml
+service/ps-nodeport created
+D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services>kubectl get svc --show-labels
+NAME          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE     LABELS
+kubernetes    ClusterIP   10.96.0.1       <none>        443/TCP        7d23h   component=apiserver,provider=kubernetes
+
+ps-nodeport   NodePort    10.103.52.152   <none>        80:31111/TCP   29s     <none>
+```
+
+The app is available on address: http://localhost:31111/
+
+Additionally by checking endpoints object we can see list of healthy pods which are available for the service:
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes> kubectl get pods --show-labels
-NAME                                                       READY   STATUS    RESTARTS   AGE     LABELS
-web-deploy-7fcb7dfd6b-486jq                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
-web-deploy-7fcb7dfd6b-7wgmb                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
-web-deploy-7fcb7dfd6b-b97c4                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
-web-deploy-7fcb7dfd6b-dj7jv                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
-web-deploy-7fcb7dfd6b-g8pkf                                1/1     Running   0          5m28s   app=web,pod-template-hash=7fcb7dfd6b
-```
+D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Services>kubectl describe ep
+Name:         kubernetes
+Namespace:    default
+Labels:       endpointslice.kubernetes.io/skip-mirror=true
+Annotations:  <none>
+Subsets:
+  Addresses:          192.168.65.4
+  NotReadyAddresses:  <none>
+  Ports:
+    Name   Port  Protocol
+    ----   ----  --------
+    https  6443  TCP
 
-##### Serivce endpoints - check pods which are available for the service
+Events:  <none>
 
-By checking endpoints object we can see list of healthy pods which are available for the service:
-```
-PS D:\GitHub\kicaj29\Kubernetes> kubectl describe ep
+
 Name:         ps-nodeport
 Namespace:    default
 Labels:       <none>
-Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2020-11-26T08:12:34Z
+Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2021-08-19T20:05:33Z
 Subsets:
-  Addresses:          10.1.1.195,10.1.1.196,10.1.1.197,10.1.1.198,10.1.1.199
+  Addresses:          10.1.0.13,10.1.0.14,10.1.0.15,10.1.0.16,10.1.0.17
   NotReadyAddresses:  <none>
   Ports:
     Name     Port  Protocol
@@ -584,7 +604,6 @@ Subsets:
 
 Events:  <none>
 ```
-
 #### Rolling update 
 
 [Rolling update](./another-nodejs-example/Deployments/rolling-update.yml)
