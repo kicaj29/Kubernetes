@@ -31,9 +31,10 @@
 - [kubectl apply vs create](#kubectl-apply-vs-create)
 - [Examples](#examples)
   - [Example 01: deploy, update, and rollback](#example-01-deploy-update-and-rollback)
-    - [build another-app image](#build-another-app-image)
-    - [publish another-app image to docker hub](#publish-another-app-image-to-docker-hub)
-    - [create pod manifest (YAML) and apply it](#create-pod-manifest-yaml-and-apply-it)
+    - [build docker image](#build-docker-image)
+    - [publish docker image to docker hub](#publish-docker-image-to-docker-hub)
+    - [Pod object](#pod-object)
+      - [create pod manifest (YAML) and apply it](#create-pod-manifest-yaml-and-apply-it)
     - [create multi container pod manifest (YAML) and apply it](#create-multi-container-pod-manifest-yaml-and-apply-it)
     - [create service node port - imperative way](#create-service-node-port---imperative-way)
     - [create service node port - declarative way](#create-service-node-port---declarative-way)
@@ -131,7 +132,9 @@ To scale up/down Kubernetes control amount of pods and not containers inside pod
 
 # ReplicaSet
 
-> "A ReplicaSet's purpose is to maintain a stable set of replica Pods running at any given time. As such, it is often used to guarantee the availability of a specified number of identical Pods."
+> "A ReplicaSet's purpose is to maintain a stable set of replica Pods running at any given time. As such, it is often used to guarantee the availability of a specified number of identical Pods."   
+
+For example it takes care that in situation when a one pod crashed a new instance of pod is created.
 
 
 # Services
@@ -317,18 +320,18 @@ https://kubernetes.io/docs/tasks/manage-kubernetes-objects/declarative-config/
 
 ## Example 01: deploy, update, and rollback
 
-[another nodejs example](./another-nodejs-example)
+[example01-deploy-update-rollback](./example01-deploy-update-rollbacke)
 
-### build another-app image
+### build docker image
 
 ```
 docker image build -t kicaj29/another-app:1.0 .
 ```
 
-### publish another-app image to docker hub
+### publish docker image to docker hub
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\App> docker image push kicaj29/another-app:1.0
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\App> docker image push kicaj29/another-app:1.0
 The push refers to repository [docker.io/kicaj29/another-app]
 493c8cfdf52f: Pushed
 22d12f79ba67: Pushed
@@ -340,14 +343,20 @@ c447987a5233: Mounted from library/node
 1.0: digest: sha256:1fe46dc33b6442ebbe5700c94891b267c59de772709c62760db62d5a861d3668 size: 1787
 ```
 
-### create pod manifest (YAML) and apply it
+### Pod object
 
-[pod manifest](./another-nodejs-example/Pods/pod.yml)
+It is possible to create pods directly but usually this approach is not used in real environments because then replica set is not created (so we cannot control amount of pods) and there is no deployment object. More [here](https://stackoverflow.com/questions/41325087/what-is-the-difference-between-a-pod-and-a-deployment). Typical in real system `Deployment` objects are used.
+
+#### create pod manifest (YAML) and apply it
+
+[pod.yaml](./example01-deploy-update-rollback/Pods/pod.yml)
+
+We can see that pod is created but it is just a one pod, `ReplicaSet` object is not created and also there is no way to access the app because `Service` object is also not created.
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl apply -f pod.yml
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl apply -f pod.yml
 pod/hello-pod created
-PS D:\GitHub\kicaj29\Kubernetes\another-nodejs-example\Pods> kubectl get pod hello-pod -o wide
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl get pod hello-pod -o wide
 NAME        READY   STATUS    RESTARTS   AGE     IP           NODE             NOMINATED NODE   READINESS GATES
 hello-pod   1/1     Running   0          2m10s   10.1.1.175   docker-desktop   <none>           <none>
 ```
@@ -355,6 +364,15 @@ hello-pod   1/1     Running   0          2m10s   10.1.1.175   docker-desktop   <
 To get full description for the pod run:
 ```
 kubectl describe pods hello-pod
+```
+
+If we delete this pod then a new pod will not be created because there is no `ReplicaSet` object that controls amount of pods:
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl delete pod hello-pod
+pod "hello-pod" deleted
+PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Pods> kubectl get pods
+No resources found in default namespace.
 ```
 
 ### create multi container pod manifest (YAML) and apply it

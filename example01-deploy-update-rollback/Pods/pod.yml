@@ -11,7 +11,8 @@ kind: Pod
 metadata:
   name: hello-pod # name of the pod
   labels:
-    app: web # this can be next used in service in selector section to point that this service should route to this type of pods
+    app: web  # label that will be assigned to the created pod
+              # can be next used in service in selector section to point that this service should route to this type of pods
 spec:
   containers:
     - name: web-ctr # name for the container (this will be used as a name for the running container in the pod)
