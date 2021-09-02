@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
@@ -33,6 +36,8 @@ namespace health_check_aspnet_core
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "health_check_aspnet_core", Version = "v1" });
             });
 
+            services.AddSingleton<StatusService>();
+
 
             //services.AddHealthChecks();
             services.AddHealthChecks()
@@ -44,6 +49,8 @@ namespace health_check_aspnet_core
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            MapHealthChecks(app);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -60,9 +67,36 @@ namespace health_check_aspnet_core
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+        }
 
-                endpoints.MapHealthChecks("/health");
-                // call GET https://localhost:5001/health to see in response "Healthy"
+        private static void MapHealthChecks(IApplicationBuilder app)
+        {
+            app.Map("/health", healthApp =>
+            {
+                healthApp.UseRouting();
+                healthApp.UseEndpoints(endpoints =>
+                {
+                    Task WriteHealthCheckResponse(HttpContext context, HealthReport result)
+                    {
+                        context.Response.ContentType = "text/plain";
+                        return context.Response.WriteAsync(result.Status.ToString());
+                    };
+
+                    HealthCheckOptions healthCheckOptions = new HealthCheckOptions()
+                    {
+                        AllowCachingResponses = false,
+                        ResponseWriter = WriteHealthCheckResponse
+                    };
+
+                    endpoints.MapHealthChecks("/ready", healthCheckOptions);
+                    endpoints.MapHealthChecks("/live", healthCheckOptions);
+                    endpoints.MapHealthChecks("/startup", healthCheckOptions);
+
+                    // call GET https://localhost:5001/health/ready to see status
+                    // call GET https://localhost:5001/health/live to see status
+                    // call GET https://localhost:5001/health/startup to see status
+                });
             });
         }
     }
