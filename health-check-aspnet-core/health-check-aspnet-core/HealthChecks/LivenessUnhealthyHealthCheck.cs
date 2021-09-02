@@ -23,7 +23,7 @@ namespace health_check_aspnet_core.HealthChecks
         {
             Debug.WriteLine("Executing LivenessUnhealthyHealthCheck");
 
-            switch(this._statusSvc.HealthStatus)
+            switch(this._statusSvc.HealthStatusLiveness)
             {
                 case HealthStatus.Unhealthy:
                     return Task.FromResult(HealthCheckResult.Unhealthy("Reported Unhealthy"));

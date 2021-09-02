@@ -10,12 +10,12 @@ namespace health_check_aspnet_core.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StatusManagementController : ControllerBase
+    public class StatusManagementLivenessController : ControllerBase
     {
 
         private StatusService _statusSvc;
 
-        public StatusManagementController(StatusService statusSvc)
+        public StatusManagementLivenessController(StatusService statusSvc)
         {
             this._statusSvc = statusSvc;
         }
@@ -23,7 +23,7 @@ namespace health_check_aspnet_core.Controllers
         [HttpPost]
         public void SetStatus(HealthStatus status)
         {
-            this._statusSvc.HealthStatus = status;
+            this._statusSvc.HealthStatusLiveness = status;
         }
     }
 }
