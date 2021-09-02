@@ -1,17 +1,18 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace health_check_aspnet_core
+namespace health_check_aspnet_core.HealthChecks
 {
-    public class ExampleHealthCheck : IHealthCheck
+    public class ReadinessUnhealthyHealthCheck : IHealthCheck
     {
         private StatusService _statusSvc;
 
-        public ExampleHealthCheck(StatusService statusSvc)
+        public ReadinessUnhealthyHealthCheck(StatusService statusSvc)
         {
             this._statusSvc = statusSvc;
         }
@@ -20,8 +21,10 @@ namespace health_check_aspnet_core
                 HealthCheckContext context,
                 CancellationToken cancellationToken = default(CancellationToken))
         {
+            Debug.WriteLine("Executing ReadinessUnhealthyHealthCheck");
 
-            switch(this._statusSvc.HealthStatus)
+
+            switch (this._statusSvc.HealthStatus)
             {
                 case HealthStatus.Unhealthy:
                     return Task.FromResult(HealthCheckResult.Unhealthy("Reported Unhealthy"));

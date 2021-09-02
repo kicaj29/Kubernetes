@@ -1,3 +1,4 @@
+using health_check_aspnet_core.HealthChecks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -41,9 +42,22 @@ namespace health_check_aspnet_core
 
             //services.AddHealthChecks();
             services.AddHealthChecks()
-                .AddCheck<ExampleHealthCheck>(
-                    "example health check"                    
+                .AddCheck<StartupHealthCheck>(
+                    "StartupHealthCheck",
+                    failureStatus: HealthStatus.Unhealthy,
+                    tags: new[] { "startup" }
+                )
+                .AddCheck<LivenessUnhealthyHealthCheck>(
+                    "LivenessReadinessUnhealthyHealthCheck",
+                    failureStatus: HealthStatus.Unhealthy,
+                    tags: new[] { "liveness" }
+                )
+                .AddCheck<ReadinessUnhealthyHealthCheck>(
+                    "ReadinessUnhealthyHealthCheck",
+                    failureStatus: HealthStatus.Unhealthy,
+                    tags: new[] { "readiness" }
                 );
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -83,15 +97,29 @@ namespace health_check_aspnet_core
                         return context.Response.WriteAsync(result.Status.ToString());
                     };
 
-                    HealthCheckOptions healthCheckOptions = new HealthCheckOptions()
+                    endpoints.MapHealthChecks("/ready", new HealthCheckOptions()
                     {
                         AllowCachingResponses = false,
-                        ResponseWriter = WriteHealthCheckResponse
-                    };
+                        ResponseWriter = WriteHealthCheckResponse,
+                        //To assign particular HealthCheck class to url pth we have to use filtering tags:
+                        Predicate = (check) => check.Tags.Contains("readiness")
+                    }); ;
 
-                    endpoints.MapHealthChecks("/ready", healthCheckOptions);
-                    endpoints.MapHealthChecks("/live", healthCheckOptions);
-                    endpoints.MapHealthChecks("/startup", healthCheckOptions);
+                    endpoints.MapHealthChecks("/live", new HealthCheckOptions()
+                    {
+                        AllowCachingResponses = false,
+                        ResponseWriter = WriteHealthCheckResponse,
+                        //To assign particular HealthCheck class to url pth we have to use filtering tags:
+                        Predicate = (check) => check.Tags.Contains("liveness")
+                    });
+
+                    endpoints.MapHealthChecks("/startup", new HealthCheckOptions()
+                    {
+                        AllowCachingResponses = false,
+                        ResponseWriter = WriteHealthCheckResponse,
+                        //To assign particular HealthCheck class to url pth we have to use filtering tags:
+                        Predicate = (check) => check.Tags.Contains("startup")
+                    });
 
                     // call GET https://localhost:5001/health/ready to see status
                     // call GET https://localhost:5001/health/live to see status
