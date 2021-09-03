@@ -11,10 +11,10 @@ namespace health_check_aspnet_core
     /// </summary>
     public class StatusService
     {
-        public HealthStatus HealthStatusStartup { get; set; } = HealthStatus.Unhealthy;
-        public HealthStatus HealthStatusLiveness { get; set; } = HealthStatus.Unhealthy;
+        public HealthStatus HealthStatusStartup { get; set; } = HealthStatus.Healthy;
+        public HealthStatus HealthStatusLiveness { get; set; } = HealthStatus.Healthy;
 
-        public HealthStatus HealthStatusReadiness { get; set; } = HealthStatus.Unhealthy;
+        public HealthStatus HealthStatusReadiness { get; set; } = HealthStatus.Healthy;
     }
 
 
