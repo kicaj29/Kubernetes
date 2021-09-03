@@ -2,6 +2,8 @@
 - [hands-on](#hands-on)
   - [Create docker image](#create-docker-image)
   - [Helm chart](#helm-chart)
+    - [Test static template](#test-static-template)
+    - [Dynamic template test](#dynamic-template-test)
 - [resources](#resources)
 
 
@@ -62,7 +64,7 @@ kicaj29/health-check-aspnet-core   1.0.0     eda7e2482eae   2 minutes ago   209M
 Helm chart was created using command `helm create chart-health-check` and contains stuff like ingress which are disabled by default in
 [values.yaml](./chart-health-check/values.yaml).
 
-To test static template of the helm chart run:
+### Test static template
 ```
 /d/GitHub/kicaj29/Kubernetes/health-check-aspnet-core (master)
 $ helm template chart-health-check
@@ -158,7 +160,7 @@ spec:
   restartPolicy: Never
 ```
 
-To run dynamic test template run:
+### Dynamic template test
 
 ```
 /d/GitHub/kicaj29/Kubernetes/health-check-aspnet-core (master)
