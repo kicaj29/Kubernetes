@@ -16,7 +16,9 @@ For example: simple database query did succeed but took more than a second. Movi
 
 # hands-on
 
-## Create docker image
+## Docker image
+
+### Create docker image
 
 Because Dockerfile is created by VisualStudio we have to point path to Dockerfile to be able build the image, more [here](https://stackoverflow.com/questions/66933949/failed-to-compute-cache-key-csproj-not-found).
 
@@ -57,6 +59,35 @@ Next we can check that the image is available in the local repo:
 $ docker images kicaj29/health-check-aspnet-core
 REPOSITORY                         TAG       IMAGE ID       CREATED         SIZE
 kicaj29/health-check-aspnet-core   1.0.0     eda7e2482eae   2 minutes ago   209MB
+```
+
+### Run the image
+
+To test if the built image is ok let`s run it:
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ docker run -p 4011:80 kicaj29/health-check-aspnet-core:1.0.0
+info: Microsoft.Hosting.Lifetime[0]
+      Now listening on: http://[::]:80
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /app
+```
+
+Next we can see it in the web browser:
+
+![01-swagger-from-container.png](images/01-swagger-from-container.png)
+
+Next we can remove this container (but do not delete the image):
+
+```
+48506@DESKTOP-6MTVGMJ C:\
+$ docker rm -f b0b
+b0b
 ```
 
 ## Helm chart
@@ -311,6 +342,9 @@ NOTES:
   export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 ```
+
+### Install helm chart
+
 
 # resources
 

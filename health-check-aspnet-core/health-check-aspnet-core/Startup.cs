@@ -72,7 +72,8 @@ namespace health_check_aspnet_core
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "health_check_aspnet_core v1"));
             }
 
-            app.UseHttpsRedirection();
+            // to use health checks via HTTP disable redirecton to HTTPS!
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 

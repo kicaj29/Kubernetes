@@ -17,6 +17,8 @@ FROM build AS publish
 RUN dotnet publish "health-check-aspnet-core.csproj" -c Release -o /app/publish
 
 FROM base AS final
+# To have working always working swagger UI we have to always be in Development mode:
+ENV ASPNETCORE_ENVIRONMENT=Development
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "health-check-aspnet-core.dll"]
