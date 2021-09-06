@@ -1,9 +1,12 @@
 - [Kubernetes probes vs asp.net core healt checks](#kubernetes-probes-vs-aspnet-core-healt-checks)
 - [hands-on](#hands-on)
-  - [Create docker image](#create-docker-image)
-  - [Helm chart](#helm-chart)
-    - [Test static template](#test-static-template)
-    - [Dynamic template test](#dynamic-template-test)
+  * [Docker image](#docker-image)
+    + [Create docker image](#create-docker-image)
+    + [Run the image](#run-the-image)
+  * [Helm chart](#helm-chart)
+    + [Test static template](#test-static-template)
+    + [Dynamic template test](#dynamic-template-test)
+    + [Install helm chart](#install-helm-chart)
 - [resources](#resources)
 
 
