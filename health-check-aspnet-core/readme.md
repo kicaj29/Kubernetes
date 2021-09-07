@@ -7,6 +7,10 @@
     + [Test static template](#test-static-template)
     + [Dynamic template test](#dynamic-template-test)
     + [Install helm chart](#install-helm-chart)
+    + [Check status of installed pods](#check-status-of-installed-pods)
+    + [Correct probes in the deployment file](#correct-probes-in-the-deployment-file)
+    + [Upgrade helm package](#upgrade-helm-package)
+    + [Check pod status](#check-pod-status)
 - [resources](#resources)
 
 
