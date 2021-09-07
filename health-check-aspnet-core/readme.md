@@ -608,6 +608,21 @@ demo-chart-health-check-6458c87dff-f4xv7   1/1     Running   0          18s
 
 Now again rest api is available from the outside of the cluster.
 
+### Simulating liveness fail
+
+Call `POST /api/StatusManagementLiveness` with value 0 (Unhealthy enum value). Then the microservice will restarted but it will be run in the same pod instance! Also we can see that the age of the microservice is increased. It means that the age measures age of the microservice and not age of the pod!!!
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl get pods
+NAME                                       READY   STATUS    RESTARTS   AGE
+demo-chart-health-check-6458c87dff-f4xv7   1/1     Running   0          9m2s
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl get pods
+NAME                                       READY   STATUS    RESTARTS   AGE
+demo-chart-health-check-6458c87dff-f4xv7   1/1     Running   1          9m36s
+```
+
 # resources
 
 https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0   
