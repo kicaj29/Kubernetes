@@ -11,8 +11,10 @@
     + [Correct probes in the deployment file](#correct-probes-in-the-deployment-file)
     + [Upgrade helm package](#upgrade-helm-package)
     + [Check pod status](#check-pod-status)
+    + [Probes skip a service](#probes-skip-a-service)
+    + [Simulating unready status](#simulating-unready-status)
+    + [Simulating liveness fail](#simulating-liveness-fail)
 - [resources](#resources)
-
 
 # Kubernetes probes vs asp.net core healt checks
 
