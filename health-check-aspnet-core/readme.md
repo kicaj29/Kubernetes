@@ -348,6 +348,214 @@ NOTES:
 
 ### Install helm chart
 
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core                    
+$ helm install demo-chart-health-check chart-health-check                                      
+NAME: demo-chart-health-check                                                                  
+LAST DEPLOYED: Tue Sep  7 10:05:55 2021                                                        
+NAMESPACE: default                                                                             
+STATUS: deployed                                                                               
+REVISION: 1                                                                                    
+NOTES:                                                                                         
+1. Get the application URL by running these commands:                                          
+  export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" se
+rvices demo-chart-health-check)                                                                
+  export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.address
+es[0].address}")                                                                               
+  echo http://$NODE_IP:$NODE_PORT                                                              
+```
+
+### Check status of installed pods
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl get pods
+NAME                                       READY   STATUS    RESTARTS   AGE
+demo-chart-health-check-5d598956db-5lg7z   0/1     Running   3          95s
+```
+
+Pod is all the time restarted because probes in deployment file are incorrectly configured:
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl describe pod demo-chart-health-check-5d598956db-5lg7z
+Name:         demo-chart-health-check-5d598956db-5lg7z
+Namespace:    default
+Priority:     0
+Node:         docker-desktop/192.168.65.4
+Start Time:   Tue, 07 Sep 2021 10:05:55 +0200
+Labels:       app.kubernetes.io/instance=demo-chart-health-check
+              app.kubernetes.io/name=chart-health-check
+              pod-template-hash=5d598956db
+Annotations:  <none>
+Status:       Running
+IP:           10.1.0.20
+IPs:
+  IP:           10.1.0.20
+Controlled By:  ReplicaSet/demo-chart-health-check-5d598956db
+Containers:
+  chart-health-check:
+    Container ID:   docker://f8908afd9acbd6a7ba6e88addf609305a1fe47266fedac6e58b39e2340986a37
+    Image:          kicaj29/health-check-aspnet-core:1.0.0
+    Image ID:       docker://sha256:a71c6ae170fb6a6577ebc8643c84487f0ca54d6b77a45f9f5bae31b6547348ad
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Tue, 07 Sep 2021 10:07:56 +0200
+    Last State:     Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Tue, 07 Sep 2021 10:07:26 +0200
+      Finished:     Tue, 07 Sep 2021 10:07:56 +0200
+    Ready:          False
+    Restart Count:  4
+    Liveness:       http-get http://:http/ delay=0s timeout=1s period=10s #success=1 #failure=3
+
+    Readiness:      http-get http://:http/ delay=0s timeout=1s period=10s #success=1 #failure=3
+
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-jqc5d (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+Volumes:
+  kube-api-access-jqc5d:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                   From               Message
+  ----     ------     ----                  ----               -------
+  Normal   Scheduled  2m29s                 default-scheduler  Successfully assigned default/demo-chart-health-check-5d598956db-5lg7z to docker-desktop
+  Normal   Started    119s (x2 over 2m28s)  kubelet            Started container chart-health-check
+  Warning  Unhealthy  119s (x3 over 2m28s)  kubelet            Readiness probe failed: Get "http://10.1.0.20:80/": dial tcp 10.1.0.20:80: connect: connection refused
+  Warning  Unhealthy  90s (x6 over 2m19s)   kubelet            Readiness probe failed: HTTP probe failed with statuscode: 404
+  Normal   Killing    90s (x2 over 2m)      kubelet            Container chart-health-check failed liveness probe, will be restarted
+  Normal   Pulled     89s (x3 over 2m28s)   kubelet            Container image "kicaj29/health-check-aspnet-core:1.0.0" already present on machine
+  Normal   Created    89s (x3 over 2m28s)   kubelet            Created container chart-health-check
+```
+
+### Correct probes in the deployment file
+
+Detailed infomration about probes parameters can be found in [docs](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes).
+
+* initialDelaySeconds: Number of seconds after the container has started before liveness or readiness probes are initiated. Defaults to 0 seconds. Minimum value is 0.
+* periodSeconds: How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1.
+* timeoutSeconds: Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1.
+* successThreshold: Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1. Must be 1 for liveness and startup Probes. Minimum value is 1.
+* failureThreshold: When a probe fails, Kubernetes will try failureThreshold times before giving up. Giving up in case of liveness probe means restarting the container. In case of readiness probe the Pod will be marked Unready. Defaults to 3. Minimum value is 1.
+
+
+### Upgrade helm package
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ helm upgrade demo-chart-health-check chart-health-check
+Release "demo-chart-health-check" has been upgraded. Happy Helming!
+NAME: demo-chart-health-check
+LAST DEPLOYED: Tue Sep  7 10:45:43 2021
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+NOTES:
+1. Get the application URL by running these commands:
+  export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services demo-chart-health-check)
+  export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+```
+
+### Check pod status
+
+Now we can see that the pod is working and we can access also swagger UI:
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl get pods
+NAME                                       READY   STATUS    RESTARTS   AGE
+demo-chart-health-check-6458c87dff-p84xq   1/1     Running   0          61s
+```
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl describe pod demo-chart-health-check-6458c87dff-p84xq
+Name:         demo-chart-health-check-6458c87dff-p84xq
+Namespace:    default
+Priority:     0
+Node:         docker-desktop/192.168.65.4
+Start Time:   Tue, 07 Sep 2021 10:45:43 +0200
+Labels:       app.kubernetes.io/instance=demo-chart-health-check
+              app.kubernetes.io/name=chart-health-check
+              pod-template-hash=6458c87dff
+Annotations:  <none>
+Status:       Running
+IP:           10.1.0.21
+IPs:
+  IP:           10.1.0.21
+Controlled By:  ReplicaSet/demo-chart-health-check-6458c87dff
+Containers:
+  chart-health-check:
+    Container ID:   docker://0d8af372e5eeaa479576aca5611480b4ac280d0bc524e5c6a2d70712cfbe6b1f
+    Image:          kicaj29/health-check-aspnet-core:1.0.0
+    Image ID:       docker://sha256:a71c6ae170fb6a6577ebc8643c84487f0ca54d6b77a45f9f5bae31b6547348ad
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Tue, 07 Sep 2021 10:45:45 +0200
+    Ready:          True
+    Restart Count:  0
+    Liveness:       http-get http://:80/health/live delay=3s timeout=1s period=8s #success=1 #failure=1
+    Readiness:      http-get http://:80/health/ready delay=3s timeout=1s period=8s #success=1 #failure=1
+    Startup:        http-get http://:80/health/startup delay=0s timeout=1s period=8s #success=1 #failure=1
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-txc8x (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+Volumes:
+  kube-api-access-txc8x:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  3m57s  default-scheduler  Successfully assigned default/demo-chart-health-check-6458c87dff-p84xq to docker-desktop
+  Normal  Pulled     3m55s  kubelet            Container image "kicaj29/health-check-aspnet-core:1.0.0" already present on machine
+  Normal  Created    3m55s  kubelet            Created container chart-health-check
+  Normal  Started    3m55s  kubelet            Started container chart-health-check
+```
+
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl get services
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+demo-chart-health-check   NodePort    10.100.195.88   <none>        80:31216/TCP   47m
+kubernetes                ClusterIP   10.96.0.1       <none>        443/TCP        18h
+```
+
+![02-swagger-from-k8s](images/02-swagger-from-k8s.png)
+
 
 # resources
 
