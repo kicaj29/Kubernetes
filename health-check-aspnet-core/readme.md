@@ -560,6 +560,53 @@ kubernetes                ClusterIP   10.96.0.1       <none>        443/TCP     
 
 ![02-swagger-from-k8s](images/02-swagger-from-k8s.png)
 
+### Probes skip a service
+
+Kubernetes directly probes individual pods with skipping a service. Only in this way it is known what it the status of particular pods.
+
+
+### Simulating unready status
+
+Using swagger UI we can now easily simulate unready status. This status usually means that a pod is very busy and should not get any more new requests as long as he will report unready status.
+To simulate this call `POST /api/StatusManagementReadiness` with value 0 (Unhealthy enum value). Then `/health/ready` will start reporting to Kubernetes 503 code with response body `Unhealthy`. If we will try communicate with this pod via K8s service/node port then we will see that the page does not exist error:
+
+![03-unready.png](images/03-unready.png)
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl get pods
+NAME                                       READY   STATUS    RESTARTS   AGE
+demo-chart-health-check-6458c87dff-p84xq   0/1     Running   0          27m
+```
+
+503 is returned only internally to K8s and all requests that come from outside of the cluster are canceled on a service level because the pod is marked as unready.
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl get pods
+NAME                                       READY   STATUS    RESTARTS   AGE
+demo-chart-health-check-6458c87dff-p84xq   0/1     Running   0          27m
+```
+
+To to move to `ready` status call `POST /api/StatusManagementReadiness` with value 2 (healthy enum value) and after this the pod will be again ready to handle the requests.
+
+>NOTE: and here we are stuck!. Because we cannot now call any endpoint from rest api we cannot simulate going back to ready status.
+It is good example that shows that all state machine has to be manage only internally!
+
+To workaround I will just remove this pod and a new pod will be created automatically by the replica set object:
+
+```
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl delete pod demo-chart-health-check-6458c87dff-p84xq
+pod "demo-chart-health-check-6458c87dff-p84xq" deleted
+
+48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
+$ kubectl get pods
+NAME                                       READY   STATUS    RESTARTS   AGE
+demo-chart-health-check-6458c87dff-f4xv7   1/1     Running   0          18s
+```
+
+Now again rest api is available from the outside of the cluster.
 
 # resources
 
