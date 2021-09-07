@@ -612,7 +612,7 @@ Now again rest api is available from the outside of the cluster.
 
 ### Simulating liveness fail
 
-Call `POST /api/StatusManagementLiveness` with value 0 (Unhealthy enum value). Then the microservice will restarted but it will be run in the same pod instance! Also we can see that the age of the microservice is increased. It means that the age measures age of the microservice and not age of the pod!!!
+Call `POST /api/StatusManagementLiveness` with value 0 (Unhealthy enum value). Then the microservice will restarted **but it will be run in the same pod instance! Also we can see that the age of the microservice is increased. It means that the age measures age of the microservice and not age of the pod!!!**
 
 ```
 48506@DESKTOP-6MTVGMJ C:\GitHub\kicaj29\Kubernetes\health-check-aspnet-core
