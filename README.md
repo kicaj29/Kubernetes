@@ -45,6 +45,7 @@
         - [Execute update](#execute-update)
         - [Execute rollback - use previous replica set](#execute-rollback---use-previous-replica-set)
         - [Removing deployment](#removing-deployment)
+  - [Example 02: select current context](#example-02-select-current-context)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [resources](#resources)
 
@@ -767,6 +768,15 @@ Error from server (NotFound): deployments.apps "web-deploy" not found
 ```
 PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> kubectl delete svc ps-nodeport
 service "ps-nodeport" deleted
+```
+
+## Example 02: select current context
+
+To connect to particular K8s use command (in this case it is K8s inside docker desktop):
+
+```
+PS D:\> kubectl config use-context docker-desktop
+Switched to context "docker-desktop".
 ```
 
 # Kubernetes dashboard
