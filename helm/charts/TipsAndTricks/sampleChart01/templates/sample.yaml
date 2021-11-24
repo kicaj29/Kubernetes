@@ -16,6 +16,11 @@ customer:
 ## here we narrow the scope of .Values.personal:
 person:
   {{- template "mychart.labels1" .Values.personal }}
+## if we want do some processing with the template then we have to use include function instead of template
 personHelpers:
-  {{- template "mychart.labels1Helpers" .Values.personal }}  
+  {{- include "mychart.labels1Helpers" .Values.personal | indent 5 }}
+## if we want do some processing with the template then we have to use include function instead of template
+## https://helm.sh/docs/chart_template_guide/function_list/#nindent (nident adds a new line to the beginning of the string)
+personHelpers1:
+  {{- include "mychart.labels1Helpers" .Values.personal | nindent 5 }}
 

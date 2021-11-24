@@ -715,7 +715,7 @@ helm repo add stable https://kubernetes-charts.storage.googleapis.com
 # Tips and tricks
 https://helm.sh/docs/chart_template_guide/named_templates/
 
-* [sampleChart01](./charts/TipsAndTricks/sampleChart01) - this chart is about using **template**, **dot** and **_helpers.tpl**.
+* [sampleChart01](./charts/TipsAndTricks/sampleChart01) - this chart is about using **template**, **include**, **dot** and **_helpers.tpl**.
 
 ```
 helm template -f .\sampleChart01\valuesTom.yaml  .\sampleChart01\
@@ -792,6 +792,27 @@ customer1:
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\TipsAndTricks> helm template -f .\sampleChart02\Values.yaml sampleChart02
 Error: YAML parse error on sampleChart01/templates/sample.yaml: error converting YAML to JSON: yaml: line 4: mapping values are not allowed in this context
 ```
+
+* [sampleChart03](./charts/TipsAndTricks/sampleChart03) - this chart is about **default** key word
+
+
+>NOTE: "This function allows you to specify a default value inside of the template, in case the value is omitted."
+More here: https://helm.sh/docs/chart_template_guide/functions_and_pipelines/#using-the-default-function
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\TipsAndTricks> helm template -f .\sampleChart03\values.yaml  .\sampleChart03\
+---
+# Source: sampleChart01/templates/sample.yaml
+customer:
+  labels:
+    fullName: Bob McDonald
+    country: NOT_DEFINED
+customer1:
+  labels:
+    fullName: Bob McDonald
+    country: NOT_DEFINED
+```
+
 
 
 

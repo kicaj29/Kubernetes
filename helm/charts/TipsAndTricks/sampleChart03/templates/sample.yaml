@@ -1,0 +1,9 @@
+{{ define "mychart.labels" }}
+  labels:
+    fullName: {{ .Values.personal.name }} {{ .Values.personal.secondName }}
+    country: {{ .Values.personal.country | default "NOT_DEFINED" }}
+{{ end }}
+customer:
+  {{- template "mychart.labels" . -}}
+customer1:
+  {{- template "mychart.labels" . }}
