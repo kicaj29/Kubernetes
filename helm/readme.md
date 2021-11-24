@@ -39,7 +39,7 @@
     - [Example how to package charts](#example-how-to-package-charts)
     - [Example how to publish charts](#example-how-to-publish-charts)
   - [Configuring helm client to work with repositories](#configuring-helm-client-to-work-with-repositories)
-- [Using existing helm chart](#using-existing-helm-chart)
+- [Tips and tricks](#tips-and-tricks)
 - [links](#links)
 
 # why helm (v3)
@@ -712,8 +712,90 @@ By default after installation helm is not connected to any repository. Usually o
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 ```
 
-# Using existing helm chart
-TBD
+# Tips and tricks
+https://helm.sh/docs/chart_template_guide/named_templates/
+
+* [sampleChart01](./charts/TipsAndTricks/sampleChart01) - this chart is about using **template**, **dot** and **_helpers.tpl**.
+
+```
+helm template -f .\sampleChart01\valuesTom.yaml  .\sampleChart01\
+helm template -f .\sampleChart01\valuesBob.yaml  .\sampleChart01\
+```
+* [sampleChart02](./charts/TipsAndTricks/sampleChart02) - this chart is about dash in curly braces
+
+"Helm’s template internally uses Golang template language. In Go template, dash is used in curly braces to skip white-space around it."
+>NOTE: Be careful! Newlines are whitespace!
+
+**{{-** indicates that whitespace should be chomped left whereas **-}}** means whitespace to the right should be consumed.
+
+```
+helm template -f .\sampleChart02\Values.yaml sampleChart02
+```
+
+The same result can be achieved in multiple ways:
+
+
+To get result like this: 
+
+```yaml
+customer:
+  labels:
+    fullName: Bob McDonald
+    country: USA
+customer1:
+  labels:
+    fullName: Bob McDonald
+    country: USA
+```
+
+the following templates can be used:
+
+```yaml
+{{ define "mychart.labels" -}}
+  labels:
+    fullName: {{ .Values.personal.name }} {{ .Values.personal.secondName }}
+    country: {{ .Values.personal.country }}
+{{- end }}
+customer:
+  {{ template "mychart.labels" . }}
+customer1:
+  {{ template "mychart.labels" . }}
+```
+
+```yaml
+{{ define "mychart.labels" }}
+  labels:
+    fullName: {{ .Values.personal.name }} {{ .Values.personal.secondName }}
+    country: {{ .Values.personal.country }}
+{{ end }}
+customer:
+  {{- template "mychart.labels" . -}}
+customer1:
+  {{- template "mychart.labels" . }}
+```
+
+Be careful with using **dash** because incorrect usage causes that generated yaml is incorrect, for example this yaml will generated incorrect out yaml file:
+
+```yaml
+{{ define "mychart.labels" }}
+  labels:
+    fullName: {{ .Values.personal.name }} {{ .Values.personal.secondName }}
+    country: {{ .Values.personal.country -}}
+{{ end }}
+customer:
+  {{- template "mychart.labels" . -}}
+customer1:
+  {{- template "mychart.labels" . }}
+```
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\TipsAndTricks> helm template -f .\sampleChart02\Values.yaml sampleChart02
+Error: YAML parse error on sampleChart01/templates/sample.yaml: error converting YAML to JSON: yaml: line 4: mapping values are not allowed in this context
+```
+
+
+
+More here https://helm.sh/docs/chart_template_guide/control_structures/ and here https://www.w3spot.com/2020/08/purpose-of-dash-inside-curly-braces-helm-template.html
 
 # links
 https://app.pluralsight.com/library/courses/kubernetes-packaging-applications-helm/exercise-files   

@@ -1,0 +1,21 @@
+## it is possible to defined a template in a yaml file and next use this template in multiple places
+## it is good practice to place such templates in _helpers.tpl files
+{{- define "mychart.labels" }}
+  labels:
+    fullName: {{ .Values.personal.name }} {{ .Values.personal.secondName }}
+    country: {{ .Values.personal.country }}
+{{- end }}
+{{- define "mychart.labels1" }}
+  labels:
+    fullName: {{ .name }} {{ .secondName }}
+    country: {{ .country }}
+{{- end }}
+customer:
+## first param is template name and second param is a scope of the passed context, if we want pass the whole context use dot:
+  {{- template "mychart.labels" . }} 
+## here we narrow the scope of .Values.personal:
+person:
+  {{- template "mychart.labels1" .Values.personal }}
+personHelpers:
+  {{- template "mychart.labels1Helpers" .Values.personal }}  
+
