@@ -1,0 +1,5 @@
+{{ define "mychart.myValue" -}}
+{{ printf "%s-%s" .Values.personal.name .Values.personal.secondName }}
+anotherField: {{ printf "%s-%s" .Values.personal.name .Values.personal.secondName }}
+{{ end }}
+customer: {{ template "mychart.myValue" . }}

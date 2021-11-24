@@ -1,5 +1,5 @@
 apiVersion: v2
-name: sampleChart01
+name: sampleChart03
 description: A Helm chart for Platform API
 
 # A chart can be either an 'application' or a 'library' chart.

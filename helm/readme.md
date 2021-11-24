@@ -813,10 +813,35 @@ customer1:
     country: NOT_DEFINED
 ```
 
+* **trunc 63**
 
+Sometimes in kubernetes some values can have max 63 chars because of this we use **trunc 63** function.
+Example here: https://github.com/helm/charts/blob/master/stable/kiam/templates/_helpers.tpl#L29
 
+* **trimSuffix**
+
+```trimSuffix "-" "hello-"``` will return `"hello"`.
+
+More here: https://helm.sh/docs/chart_template_guide/function_list/#trimsuffix
 
 More here https://helm.sh/docs/chart_template_guide/control_structures/ and here https://www.w3spot.com/2020/08/purpose-of-dash-inside-curly-braces-helm-template.html
+
+* [sampleChart04](./charts/TipsAndTricks/sampleChart04) - this chart is about **printf** function
+
+```
+helm template -f .\sampleChart04\values.yaml  .\sampleChart04\
+```
+**printf** can be used to concatenate\format a string values.
+
+More here: https://helm.sh/docs/chart_template_guide/function_list/#printf
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\TipsAndTricks> helm template -f .\sampleChart04\values.yaml  .\sampleChart04\
+---
+# Source: sampleChart04/templates/sample.yaml
+customer: Bob-McDonald
+anotherField: Bob-McDonald
+```
 
 # links
 https://app.pluralsight.com/library/courses/kubernetes-packaging-applications-helm/exercise-files   
