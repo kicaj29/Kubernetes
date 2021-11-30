@@ -117,6 +117,10 @@ kubectl apply -f settings-cm.yaml
 ```
 kubectl apply -f sample-pod.yaml
 ```
+To see values printed by `echo` command:
+```
+kubectl logs pod1
+```
 Next we can check that the files has been created:
 ```
 PS D:\GitHub\kicaj29\Kubernetes> kubectl exec -it pod1 -- /bin/sh
