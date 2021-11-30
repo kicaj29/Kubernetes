@@ -3,6 +3,8 @@
 Secrets can be created using yaml files or via CLI.
 If we use CLI then we do not have to pass base64 values because it is encoded automatically by the command.
 
+>NOTE: by default secrets are not encrypted in K8s, more here: https://kubernetes.io/docs/concepts/configuration/secret/
+
 Using file:
 ```
 kubectl apply -f my-secrets.yaml
