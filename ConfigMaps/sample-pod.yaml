@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+spec:
+  containers:
+    - name: my-container
+      image: alpine
+      # https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+      # by default alpine container exists as soon as the "start" process finishes
+      # to keep container running create a loop
+      # https://stackoverflow.com/questions/39729241/why-does-the-container-created-with-docker-run-d-alpine-sleep-infinity-goes/39729598#39729598
+      command: ["/bin/sh"]
+      args: ["-c", "echo 'var1=$(EVAR1) and var2=$(EVAR2)' && while sleep 3600; do :; done"]
+      env:
+      - name: EVAR1
+        valueFrom:
+          configMapKeyRef:
+            name: my-settings-config
+            key: key1
+      - name: EVAR2
+        valueFrom:
+          configMapKeyRef:
+            name: my-settings-config
+            key: key2
+      volumeMounts:
+        - name: vol1-settings
+          mountPath: "/config"
+          readOnly: true
+  volumes:
+    - name: vol1-settings
+      configMap:
+        name: my-settings-config
+        # if we would skip items section that then every key will create a file with name the same as the key and file content will be value of the key
+        items:
+          - key: "mySettings.conf"
+            path: "mySettings.conf"
+          - key: "database.conf"
+            path: "database.conf"          

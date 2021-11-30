@@ -1,0 +1,17 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: my-settings-config
+data:
+  key1: val1
+  key2: val2
+  # mySettings.conf will be the file name  
+  mySettings.conf: |
+    setting1=value1
+    setting2=value2
+    setting3=value3
+  # database.conf will be the file name  
+  database.conf: |
+    dbsetting1=dbvalue1
+    dbsetting2=dbvalue2
+    dbsetting2=dbvalue3
