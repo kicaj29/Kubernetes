@@ -620,6 +620,8 @@ web-deploy-58d76756b7-v6mdd   1/1     Running   0          10s
 web-deploy-58d76756b7-wx4rs   1/1     Running   0          10m
 ```
 
+>NOTE: ReplicaSet is a new version of ReplicationController. The replication controller supports equality based selectors whereas the replica set supports equality based as well as set based selectors. Another major difference is that the rolling-update command works with Replication Controllers, but won’t work with a Replica Set. This is because Replica Sets are meant to be used as the backend for Deployments - more [here](https://www.mirantis.com/blog/kubernetes-replication-controller-replica-set-and-deployments-understanding-replication-options/).
+
 #### Rolling update 
 
 [Rolling update](./example01-deploy-update-rollback/Deployments/rolling-update.yml)
