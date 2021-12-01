@@ -805,8 +805,10 @@ Next paste value from red rectangle to input for from the dashboard web UI.
 
 # Selectors: equality-based and set-based
 
-Equality-based: =, ==, !=  (= and == is the same thing)   
-Set-based: in, notin, exists
+* Equality-based: =, ==, !=  (= and == is the same thing)   
+
+
+* Set-based: in, notin, exists
 
 Examples of equality-based:
 ```
@@ -840,6 +842,24 @@ selector:
     - {key: environment, operator: In, values:[prod, qa]}
     - {key: tier, operator: NotIn, values: [frontend, backend]}
 ```
+
+* matchLabels
+
+We can do:
+```
+selector:
+  app: nginx
+  tier: frontned
+```
+or with **matchLabels**:
+```
+selector:
+  matchLabels:
+    app: nginx
+    tier: frontend
+```
+
+matchLabels are used on newer resources like: ReplicaSet, Deployment, Job, DaemonSet
 
 # resources
 https://app.pluralsight.com/library/courses/getting-started-kubernetes    
