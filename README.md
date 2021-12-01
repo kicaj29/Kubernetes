@@ -47,6 +47,7 @@
         - [Removing deployment](#removing-deployment)
   - [Example 02: select current context](#example-02-select-current-context)
 - [Kubernetes dashboard](#kubernetes-dashboard)
+- [Selectors: equality-based and set-based](#selectors-equality-based-and-set-based)
 - [resources](#resources)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
@@ -801,6 +802,44 @@ kubectl -n kubernetes-dashboard describe secret [TOKEN]
 ![get-token](images/get-token.png)
 
 Next paste value from red rectangle to input for from the dashboard web UI.
+
+# Selectors: equality-based and set-based
+
+Equality-based: =, ==, !=  (= and == is the same thing)   
+Set-based: in, notin, exists
+
+Examples of equality-based:
+```
+environment = production
+tier != frontend
+```
+Examples of set-based:
+```
+environment in (production, qa)
+tier notin (frontend, backing)
+```
+
+In CLI
+```
+kubectl get pods -l environment=production
+```
+```
+kubectl get pods -l environment in (production)
+```
+
+In manifest file equality-based:
+```yaml
+selector:
+  environment: production
+  tier: frontend
+```
+In manifest file set-based:
+```yaml
+selector:
+  matchExpression:
+    - {key: environment, operator: In, values:[prod, qa]}
+    - {key: tier, operator: NotIn, values: [frontend, backend]}
+```
 
 # resources
 https://app.pluralsight.com/library/courses/getting-started-kubernetes    
