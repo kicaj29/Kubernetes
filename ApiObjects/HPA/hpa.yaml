@@ -19,6 +19,7 @@ spec:
         - containerPort: 80
         resources:
           requests:
+            # it is 500m for each created pod, it is not a sum of all pods!
             cpu: 500m
           limits:
             cpu: 1000m
