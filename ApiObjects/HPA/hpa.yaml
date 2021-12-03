@@ -20,8 +20,10 @@ spec:
         resources:
           requests:
             # it is 500m for each created pod, it is not a sum of all pods!
+            # https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/#cpu-units
             cpu: 500m
           limits:
+            # if the pod goes about 1000m then K8s will kill this pod!
             cpu: 1000m
 
 ---

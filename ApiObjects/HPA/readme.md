@@ -1,6 +1,11 @@
-# Introduction - installation of metrics server
+# Introduction - 
 
-https://www.youtube.com/watch?v=3BnrXapY7zo
+HPA creates a new replica of pod if **current pod** CPU is greater then CPU requested in the manifest file.
+
+![001_HPA.png](./images/001_HPA.png)
+
+# Installation of metrics server
+
 https://dev.to/docker/enable-kubernetes-metrics-server-on-docker-desktop-5434
 
 To use HPA we have to install metrics server because it is not installed together with K8s.
@@ -121,3 +126,6 @@ php-apache   Deployment/php-apache   <unknown>/50%   1         10        0      
 kubectl delete -f metrics-server-components.yaml
 kubectl delete -f hpa.yaml
 ```
+
+# Links
+https://www.youtube.com/watch?v=3BnrXapY7zo
