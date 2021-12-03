@@ -1,5 +1,6 @@
 # Introduction - installation of metrics server
 
+https://www.youtube.com/watch?v=3BnrXapY7zo
 https://dev.to/docker/enable-kubernetes-metrics-server-on-docker-desktop-5434
 
 To use HPA we have to install metrics server because it is not installed together with K8s.
