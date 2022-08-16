@@ -44,3 +44,9 @@ csinode.storage.k8s.io/ip-10-2-14-88.ec2.internal    0         18d
 csinode.storage.k8s.io/ip-10-2-30-153.ec2.internal   0         18d
 csinode.storage.k8s.io/ip-10-2-45-38.ec2.internal    0         18d
 ```
+
+# Query all pods to discover the ones which have annotation that have "annotations.authentication.k8s.io/stale-token"
+
+```
+kubectl get po -A -o=json | jq '[. | {pod: .items[].metadata}][] | {name: .pod.name, annotations: .pod.annotations}'
+```
