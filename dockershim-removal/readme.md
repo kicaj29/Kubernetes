@@ -2,6 +2,7 @@
 
 https://kubernetes.io/blog/2020/12/02/dont-panic-kubernetes-and-docker/
 https://kubernetes.io/docs/tasks/administer-cluster/migrating-from-dockershim/check-if-dockershim-removal-affects-you/
+https://www.youtube.com/watch?v=7KUdmFyefSA
 
 Dockershim was the container runtime for the kubernetes, but it has been superseded by the better CRI pluggable system.
 
