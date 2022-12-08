@@ -163,23 +163,59 @@ In case we did a change only in single yaml file that we can update only this fi
 
 >NOTE: template properties do not support dash -
 
-We refer to local chart and not chart from official helm repostory.
+We refer to local chart and not chart from official helm repository.
 
+K8s state before this exercise:
+
+```ps
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> kubectl get all
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   67m
 ```
-helm install demoguestbook guestbook
-helm uninstall demoguestbook
+
+Install:
+```ps
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> helm install demoguestbook guestbook
+NAME: demoguestbook
+LAST DEPLOYED: Thu Dec  8 12:16:34 2022
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
 ```
-![install-char1](images/install-char1.png)
+
+Next we can check created kubernetes objects:
+```ps
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> kubectl get all
+NAME                           READY   STATUS    RESTARTS   AGE
+pod/frontend-6c8b5cc5b-xcqc2   1/1     Running   0          3m13s
+
+NAME                 TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE  
+service/frontend     NodePort    10.96.128.48   <none>        80:30007/TCP   3m13s
+service/kubernetes   ClusterIP   10.96.0.1      <none>        443/TCP        66m
+
+NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/frontend   1/1     1            1           3m13s
+
+NAME                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/frontend-6c8b5cc5b   1         1         1       3m13s
+```
+
+Next we can use the following command to see release details:
+```
+helm get manifest demoguestbook
+```
+
+Next uninstall:
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> helm uninstall demoguestbook
+release "demoguestbook" uninstalled
+```
 
 Open in web browser http://localhost:30007/ to see the app.
 
 ![chart1-app](images/chart1-app.png)
 
-Next we can use the following command to see release details:
-
-```
-helm get manifest demoguestbook
-```
 
 ## chart2
 
