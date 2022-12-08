@@ -186,19 +186,19 @@ TEST SUITE: None
 
 Next we can check created kubernetes objects:
 ```ps
-PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> kubectl get all
-NAME                           READY   STATUS    RESTARTS   AGE
-pod/frontend-6c8b5cc5b-xcqc2   1/1     Running   0          3m13s
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> kubectl get all                     
+NAME                                      READY   STATUS    RESTARTS   AGE
+pod/frontend-deployment-c895dbb85-c6g6w   1/1     Running   0          6s
 
-NAME                 TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE  
-service/frontend     NodePort    10.96.128.48   <none>        80:30007/TCP   3m13s
-service/kubernetes   ClusterIP   10.96.0.1      <none>        443/TCP        66m
+NAME                       TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+service/frontend-service   NodePort    10.99.203.68   <none>        80:30007/TCP   6s 
+service/kubernetes         ClusterIP   10.96.0.1      <none>        443/TCP        87m
 
-NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/frontend   1/1     1            1           3m13s
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/frontend-deployment   1/1     1            1           6s
 
-NAME                                 DESIRED   CURRENT   READY   AGE
-replicaset.apps/frontend-6c8b5cc5b   1         1         1       3m13s
+NAME                                            DESIRED   CURRENT   READY   AGE
+replicaset.apps/frontend-deployment-c895dbb85   1         1         1       6s
 ```
 
 Next we can use the following command to see release details:

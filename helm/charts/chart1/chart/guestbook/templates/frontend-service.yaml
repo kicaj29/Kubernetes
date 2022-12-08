@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    name: frontend
-  name: frontend
+    name: frontend-metadata
+  name: frontend-service
 spec:
   type: NodePort
   ports:
@@ -17,4 +17,4 @@ spec:
   selector:
     # This selector is used to know to which pods that traffic should be redirected.
     # Should match to the template metadata defined in deployment yaml file.
-    app: frontend
+    app: frontend-template
