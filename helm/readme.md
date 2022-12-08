@@ -318,6 +318,12 @@ replicaset.apps/frontend-deployment-cc8f88cdb    0         0         0       20m
 replicaset.apps/mongodb-6564679459               1         1         1       7m4s
 ```
 
+* Adding data
+
+Add some data in the web app and next send request to `http://localhost:31111/guestbook`.
+Sample response: `[{"_id":"6391d4658ff56f16834870f5","name":"Jacek","message":"Placek"}]`
+
+
 ## chart 4 - INGRESS controller
 
 >NOTE: before we start we have to uninstall previous release because upgrade is not possible.
