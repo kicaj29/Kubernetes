@@ -1,24 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: frontend-deployment
 spec:
   replicas: 1
   selector:
+    # Defines how the created ReplicaSet finds which Pods to manage.
+    # Typically it is the same value as value defined in the template metadata.
     matchLabels:
-      app: frontend 
+      app: frontend-template
   template:
+    # Allows identify created pods.
+    # `frontend-template` is not a name of the pod(s). Pod name is created based on deployment name, for example: pod/frontend-deployment-c895dbb85-c6g6w
     metadata:
       labels:
-        app: frontend
+        app: frontend-template
     spec:
       containers:
       - image: phico/frontend:2.0
         imagePullPolicy: Always
         name: frontend
         ports:
-        - name: frontend
-          containerPort: 4200
+        - containerPort: 4200
         env:
         - name: BACKEND_URI
           valueFrom:

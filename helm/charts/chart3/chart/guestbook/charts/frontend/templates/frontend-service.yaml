@@ -2,13 +2,19 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    name: frontend
-  name: frontend
+    name: frontend-metadata
+  name: frontend-service
 spec:
   type: NodePort
   ports:
-    - protocol: "TCP"
-      port: 80
+      # Port of the service.
+    - port: 80
+      # This is pod port (should be the same as port defined in deployment yaml file).
       targetPort: 4200
+      # By default and for convenience, the Kubernetes control plane will allocate a port from a range (default: 30000-32767).
+      # This port should be used to access the app.
+      nodePort: 30007
   selector:
-    app: frontend
+    # This selector is used to know to which pods that traffic should be redirected.
+    # Should match to the template metadata defined in deployment yaml file.
+    app: frontend-template

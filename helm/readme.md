@@ -263,18 +263,60 @@ chart 3 adds back-end and database.
 
 *version* field in main *Chart.yaml* is updated to 1.1.0 because there are changes in infrastructure.
 
+* Upgrade
+```ps
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart3\chart> helm upgrade demoguestbook guestbook
+Release "demoguestbook" has been upgraded. Happy Helming!
+NAME: demoguestbook
+LAST DEPLOYED: Thu Dec  8 13:02:48 2022
+NAMESPACE: default
+STATUS: deployed
+REVISION: 4
+TEST SUITE: None
 ```
-helm upgrade demoguestbook guestbook
+
+* History
+```ps
+S D:\GitHub\kicaj29\Kubernetes\helm\charts\chart3\chart> helm history demoguestbook
+REVISION        UPDATED                         STATUS          CHART           APP VERSION     DESCRIPTION     
+1               Thu Dec  8 12:45:23 2022        superseded      guestbook-0.1.0 1.0             Install complete
+2               Thu Dec  8 12:49:52 2022        superseded      guestbook-0.1.0 1.1             Upgrade complete
+3               Thu Dec  8 12:52:14 2022        superseded      guestbook-0.1.0 1.0             Rollback to 1   
+4               Thu Dec  8 13:02:48 2022        deployed        guestbook-1.1.0 2.0             Upgrade complete
 ```
-![chart3-app](images/chart3-app.png)
 
-Next we can check status and history:
-
-![chart3-history](images/chart3-history.png)
-
-and we can open the new app: http://localhost:31705
+* Open the app
+Use url: http://localhost:30007
 
 ![app-20](images/app-20.png)
+
+* Check all K8s objects
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart3\chart> kubectl get all
+NAME                                       READY   STATUS    RESTARTS        AGE 
+pod/backend-54b8499f6-klwlh                1/1     Running   3 (5m24s ago)   7m4s
+pod/frontend-deployment-5956bbfc8f-jdrl5   1/1     Running   0               7m4s
+pod/mongodb-6564679459-94r95               1/1     Running   0               7m4s
+
+NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)           AGE
+service/backend            NodePort    10.107.150.204   <none>        80:31111/TCP      7m4s
+service/frontend-service   NodePort    10.96.6.104      <none>        80:30007/TCP      24m
+service/kubernetes         ClusterIP   10.96.0.1        <none>        443/TCP           116m
+service/mongodb            NodePort    10.96.65.57      <none>        27017:31100/TCP   7m4s
+
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/backend               1/1     1            1           7m4s
+deployment.apps/frontend-deployment   1/1     1            1           24m
+deployment.apps/mongodb               1/1     1            1           7m4s
+
+NAME                                             DESIRED   CURRENT   READY   AGE
+replicaset.apps/backend-54b8499f6                1         1         1       7m4s
+replicaset.apps/frontend-deployment-5956bbfc8f   1         1         1       7m4s
+replicaset.apps/frontend-deployment-c895dbb85    0         0         0       24m
+replicaset.apps/frontend-deployment-cc8f88cdb    0         0         0       20m
+replicaset.apps/mongodb-6564679459               1         1         1       7m4s
+```
 
 ## chart 4 - INGRESS controller
 
