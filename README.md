@@ -876,6 +876,8 @@ Sample configuration:
   name: docker-desktop
 ```
 
+More about this can be found here https://github.com/argoproj/argo-cd/issues/1965
+
 # resources
 https://app.pluralsight.com/library/courses/getting-started-kubernetes    
 https://app.pluralsight.com/library/courses/azure-container-service-big-picture/table-of-contents    
