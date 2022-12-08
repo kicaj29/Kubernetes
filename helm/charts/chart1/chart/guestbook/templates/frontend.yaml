@@ -5,9 +5,12 @@ metadata:
 spec:
   replicas: 1
   selector:
+    # Defines how the created ReplicaSet finds which Pods to manage.
+    # Typically it is the same value as value defined in the template metadata.
     matchLabels:
       app: frontend 
   template:
+    # Allows identify created pods.
     metadata:
       labels:
         app: frontend

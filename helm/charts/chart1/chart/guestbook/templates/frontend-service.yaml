@@ -7,11 +7,14 @@ metadata:
 spec:
   type: NodePort
   ports:
-      # port of the service
+      # Port of the service.
     - port: 80
-      # By default and for convenience, the `targetPort` is set to the same value as the `port` field (it is port of pod)
+      # This is pod port (should be the same as port defined in deployment yaml file).
       targetPort: 4200
-      # By default and for convenience, the Kubernetes control plane will allocate a port from a range (default: 30000-32767)
+      # By default and for convenience, the Kubernetes control plane will allocate a port from a range (default: 30000-32767).
+      # This port should be used to access the app.
       nodePort: 30007
   selector:
+    # This selector is used to know to which pods that traffic should be redirected.
+    # Should match to the template metadata defined in deployment yaml file.
     app: frontend
