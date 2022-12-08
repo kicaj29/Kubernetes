@@ -48,6 +48,7 @@
   - [Example 02: select current context](#example-02-select-current-context)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [Selectors: equality-based and set-based](#selectors-equality-based-and-set-based)
+- [OpenLens and K8s from Docker Desktop](#openlens-and-k8s-from-docker-desktop)
 - [resources](#resources)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
@@ -860,6 +861,20 @@ selector:
 ```
 
 matchLabels are used on newer resources like: ReplicaSet, Deployment, Job, DaemonSet
+
+# OpenLens and K8s from Docker Desktop
+
+To connect OpenLens to K8s from Docker Desktop file `C:\Users\[USER_NAME]\.kube\config` has to be updated
+by adding a parameter `insecure-skip-tls-verify: true` and by commenting out `certificate-authority-data`.
+Sample configuration:
+
+```yaml
+- cluster:
+    # certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMvakNDQWVhZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURW...
+    server: https://kubernetes.docker.internal:6443
+    insecure-skip-tls-verify: true
+  name: docker-desktop
+```
 
 # resources
 https://app.pluralsight.com/library/courses/getting-started-kubernetes    
