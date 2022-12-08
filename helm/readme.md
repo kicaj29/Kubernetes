@@ -184,19 +184,19 @@ TEST SUITE: None
 
 * Next we can check created kubernetes objects
 ```ps
-PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> kubectl get all                     
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> kubectl get all
 NAME                                      READY   STATUS    RESTARTS   AGE
-pod/frontend-deployment-c895dbb85-c6g6w   1/1     Running   0          6s
+pod/frontend-deployment-c895dbb85-5ppt6   1/1     Running   0          5s
 
-NAME                       TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
-service/frontend-service   NodePort    10.99.203.68   <none>        80:30007/TCP   6s 
-service/kubernetes         ClusterIP   10.96.0.1      <none>        443/TCP        87m
+NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+service/frontend-service   NodePort    10.106.166.212   <none>        80:30007/TCP   5s
+service/kubernetes         ClusterIP   10.96.0.1        <none>        443/TCP        136m
 
 NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/frontend-deployment   1/1     1            1           6s
+deployment.apps/frontend-deployment   1/1     1            1           5s
 
 NAME                                            DESIRED   CURRENT   READY   AGE
-replicaset.apps/frontend-deployment-c895dbb85   1         1         1       6s
+replicaset.apps/frontend-deployment-c895dbb85   1         1         1       5s
 ```
 
 * Next we can use the following command to see release details
@@ -204,16 +204,15 @@ replicaset.apps/frontend-deployment-c895dbb85   1         1         1       6s
 helm get manifest demoguestbook
 ```
 
-* Next uninstall
-```
-PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> helm uninstall demoguestbook
-release "demoguestbook" uninstalled
-```
-
 * Open in web browser http://localhost:30007/ to see the app.
 
 ![chart1-app](images/chart1-app.png)
 
+* Next uninstall (do not do it if want to upgrade to char2)
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> helm uninstall demoguestbook
+release "demoguestbook" uninstalled
+```
 
 ## chart2
 
@@ -236,11 +235,51 @@ REVISION: 2
 TEST SUITE: None
 ```
 
+* Next we can check created kubernetes objects
+**We can see that new replica set has been created and previous one is preserved.**
+This is required to be able later do rollbacks (replica set contains pod definitions)!
+```ps
+NAME                                      READY   STATUS    RESTARTS   AGE
+pod/frontend-deployment-cc8f88cdb-9x5lx   1/1     Running   0          6s
+
+NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+service/frontend-service   NodePort    10.106.166.212   <none>        80:30007/TCP   80s
+service/kubernetes         ClusterIP   10.96.0.1        <none>        443/TCP        137m
+
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/frontend-deployment   1/1     1            1           80s
+
+NAME                                            DESIRED   CURRENT   READY   AGE
+replicaset.apps/frontend-deployment-c895dbb85   0         0         0       80s
+replicaset.apps/frontend-deployment-cc8f88cdb   1         1         1       6s
+```
+
 * Rollback to revision 1 of the release
 
 ```
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart2\chart> helm rollback demoguestbook 1
 Rollback was a success! Happy Helming!
+```
+
+* Again check K8s objects
+
+**We can see that replica set created during first deployment is again used**
+
+```ps
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart2\chart> kubectl get all
+NAME                                      READY   STATUS    RESTARTS   AGE
+pod/frontend-deployment-c895dbb85-zz8kk   1/1     Running   0          7s
+
+NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+service/frontend-service   NodePort    10.106.166.212   <none>        80:30007/TCP   2m24s
+service/kubernetes         ClusterIP   10.96.0.1        <none>        443/TCP        138m
+
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/frontend-deployment   1/1     1            1           2m24s
+
+NAME                                            DESIRED   CURRENT   READY   AGE
+replicaset.apps/frontend-deployment-c895dbb85   1         1         1       2m24s
+replicaset.apps/frontend-deployment-cc8f88cdb   0         0         0       70s
 ```
 
 * History
@@ -291,31 +330,31 @@ Use url: http://localhost:30007
 ![app-20](images/app-20.png)
 
 * Check all K8s objects
-
+**Again can see that new replica set has been created.**
 ```
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart3\chart> kubectl get all
-NAME                                       READY   STATUS    RESTARTS        AGE 
-pod/backend-54b8499f6-klwlh                1/1     Running   3 (5m24s ago)   7m4s
-pod/frontend-deployment-5956bbfc8f-jdrl5   1/1     Running   0               7m4s
-pod/mongodb-6564679459-94r95               1/1     Running   0               7m4s
+NAME                                       READY   STATUS    RESTARTS      AGE
+pod/backend-54b8499f6-vgk76                1/1     Running   1 (16s ago)   21s
+pod/frontend-deployment-5956bbfc8f-wchg5   1/1     Running   0             21s
+pod/mongodb-6564679459-d7wqx               1/1     Running   0             21s
 
 NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)           AGE
-service/backend            NodePort    10.107.150.204   <none>        80:31111/TCP      7m4s
-service/frontend-service   NodePort    10.96.6.104      <none>        80:30007/TCP      24m
-service/kubernetes         ClusterIP   10.96.0.1        <none>        443/TCP           116m
-service/mongodb            NodePort    10.96.65.57      <none>        27017:31100/TCP   7m4s
+service/backend            NodePort    10.106.196.223   <none>        80:31111/TCP      21s
+service/frontend-service   NodePort    10.106.166.212   <none>        80:30007/TCP      3m15s
+service/kubernetes         ClusterIP   10.96.0.1        <none>        443/TCP           139m
+service/mongodb            NodePort    10.100.175.4     <none>        27017:31865/TCP   21s
 
 NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/backend               1/1     1            1           7m4s
-deployment.apps/frontend-deployment   1/1     1            1           24m
-deployment.apps/mongodb               1/1     1            1           7m4s
+deployment.apps/backend               1/1     1            1           21s
+deployment.apps/frontend-deployment   1/1     1            1           3m15s
+deployment.apps/mongodb               1/1     1            1           21s
 
 NAME                                             DESIRED   CURRENT   READY   AGE
-replicaset.apps/backend-54b8499f6                1         1         1       7m4s
-replicaset.apps/frontend-deployment-5956bbfc8f   1         1         1       7m4s
-replicaset.apps/frontend-deployment-c895dbb85    0         0         0       24m
-replicaset.apps/frontend-deployment-cc8f88cdb    0         0         0       20m
-replicaset.apps/mongodb-6564679459               1         1         1       7m4s
+replicaset.apps/backend-54b8499f6                1         1         1       21s
+replicaset.apps/frontend-deployment-5956bbfc8f   1         1         1       21s
+replicaset.apps/frontend-deployment-c895dbb85    0         0         0       3m15s
+replicaset.apps/frontend-deployment-cc8f88cdb    0         0         0       2m1s
+replicaset.apps/mongodb-6564679459               1         1         1       21s
 ```
 
 * Adding data
