@@ -330,6 +330,7 @@ Use url: http://localhost:30007
 ![app-20](images/app-20.png)
 
 * Check all K8s objects
+
 **Again can see that new replica set has been created.**
 ```
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart3\chart> kubectl get all
