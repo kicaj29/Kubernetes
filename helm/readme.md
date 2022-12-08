@@ -13,8 +13,6 @@
 - [install, upgrade, rollback](#install-upgrade-rollback)
   - [chart1](#chart1)
   - [chart2](#chart2)
-  - [rollback to revision 1 of the release](#rollback-to-revision-1-of-the-release)
-    - [history](#history)
   - [chart 3](#chart-3)
   - [chart 4 - INGRESS controller](#chart-4---ingress-controller)
 - [Customizing charts with helm templates](#customizing-charts-with-helm-templates)
@@ -165,7 +163,7 @@ In case we did a change only in single yaml file that we can update only this fi
 
 We refer to local chart and not chart from official helm repository.
 
-K8s state before this exercise:
+* K8s state before this exercise
 
 ```ps
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> kubectl get all
@@ -173,7 +171,7 @@ NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   67m
 ```
 
-Install:
+* Install
 ```ps
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> helm install demoguestbook guestbook
 NAME: demoguestbook
@@ -184,7 +182,7 @@ REVISION: 1
 TEST SUITE: None
 ```
 
-Next we can check created kubernetes objects:
+* Next we can check created kubernetes objects
 ```ps
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> kubectl get all                     
 NAME                                      READY   STATUS    RESTARTS   AGE
@@ -201,18 +199,18 @@ NAME                                            DESIRED   CURRENT   READY   AGE
 replicaset.apps/frontend-deployment-c895dbb85   1         1         1       6s
 ```
 
-Next we can use the following command to see release details:
+* Next we can use the following command to see release details
 ```
 helm get manifest demoguestbook
 ```
 
-Next uninstall:
+* Next uninstall
 ```
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart1\chart> helm uninstall demoguestbook
 release "demoguestbook" uninstalled
 ```
 
-Open in web browser http://localhost:30007/ to see the app.
+* Open in web browser http://localhost:30007/ to see the app.
 
 ![chart1-app](images/chart1-app.png)
 
@@ -223,29 +221,37 @@ Open in web browser http://localhost:30007/ to see the app.
 
 Here we deploy the same chart but with different application. The change was only in the application and not in the chart.
 *appVersion* and *description* from *Chart.yaml* are set to 1.1 but *version* of the chart stays the same 0.1.0.   
-In *frontend.yaml* we refer to new image *phico/frontend:1.1*.
+In *frontend.yaml* we refer to new image *phico/frontend:1.1*. Previous version of chart has to installed in K8s before this step to have possibility to upgrade.
 
-```
-helm upgrade demoguestbook guestbook
-```
+* Upgrade
 
-![chart2-app](images/chart2-app.png)
-
-## rollback to revision 1 of the release
-
-```
-helm rollback demoguestbook 1
-```
-
-![rollback.png](images/rollback.png)
-
-### history
-
-```
-helm history demoguestbook
+```ps
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart2\chart> helm upgrade demoguestbook guestbook
+Release "demoguestbook" has been upgraded. Happy Helming!
+NAME: demoguestbook
+LAST DEPLOYED: Thu Dec  8 12:49:52 2022
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
 ```
 
-![helm-history](images/helm-history.png)
+* Rollback to revision 1 of the release
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart2\chart> helm rollback demoguestbook 1
+Rollback was a success! Happy Helming!
+```
+
+* History
+
+```ps
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart2\chart> helm history demoguestbook
+REVISION        UPDATED                         STATUS          CHART           APP VERSION     DESCRIPTION     
+1               Thu Dec  8 12:45:23 2022        superseded      guestbook-0.1.0 1.0             Install complete
+2               Thu Dec  8 12:49:52 2022        superseded      guestbook-0.1.0 1.1             Upgrade complete
+3               Thu Dec  8 12:52:14 2022        deployed        guestbook-0.1.0 1.0             Rollback to 1
+```
 
 ## chart 3
 
