@@ -34,6 +34,7 @@
 - [Managing dependencies](#managing-dependencies)
   - [Packaging charts](#packaging-charts)
   - [Publishing charts in helm repository](#publishing-charts-in-helm-repository)
+  - [Pulling charts from helm repository](#pulling-charts-from-helm-repository)
     - [Example how to package charts](#example-how-to-package-charts)
     - [Example how to publish charts](#example-how-to-publish-charts)
   - [Configuring helm client to work with repositories](#configuring-helm-client-to-work-with-repositories)
@@ -748,6 +749,26 @@ Helm repository also support signing charts:
 helm package --sign
 helm verify chart.tgz
 helm install --verify
+```
+
+## Pulling charts from helm repository
+
+* Add a repository
+
+```
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+```
+
+* List all repos `helm repo list`
+```
+NAME            URL
+stable          https://charts.helm.sh/stable
+ingress-nginx   https://kubernetes.github.io/ingress-nginx
+```
+
+* Pull from repo (it will create locally a file with the chart)
+```
+helm pull ingress-nginx/ingress-nginx --version 4.4.0
 ```
 
 ### Example how to package charts
