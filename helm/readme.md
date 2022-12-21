@@ -721,7 +721,7 @@ metadata:
 ...
 ```
 
-It means that after installing this chart it will not work. This problem is solved in chart 6.
+It means that after installing this chart will not work. This problem is solved in chart 6.
 
 ```
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart5-customizing-charts\chart> helm install demoguestbook guestbook
@@ -744,6 +744,11 @@ Error: connect ECONNREFUSED 104.45.152.13:27017
     at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1191:14)
 ```
 
+Uninstall chart5
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart5-customizing-charts\chart> helm uninstall demoguestbook
+release "demoguestbook" uninstalled
+```
 
 ## chart 6 - logic with building connection string to mongodb
 
