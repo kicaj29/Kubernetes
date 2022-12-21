@@ -4,5 +4,5 @@ backend:
       username: admin
       password: password
   fullnameOverride: my-test-backend
-database:
-  fullnameOverride: my-test-database
+#database:
+  #fullnameOverride: my-test-database
