@@ -1,0 +1,7 @@
+# Read more about ingress class: https://sam-thomas.medium.com/kubernetes-ingressclass-error-ingress-does-not-contain-a-valid-ingressclass-78aab72c15a6
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: my-nginx
+spec:
+  controller: k8s.io/ingress-nginx # use your controller name.

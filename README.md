@@ -46,6 +46,7 @@
         - [Execute rollback - use previous replica set](#execute-rollback---use-previous-replica-set)
         - [Removing deployment](#removing-deployment)
   - [kubectl context](#kubectl-context)
+  - [kubectl get yaml for existing resource](#kubectl-get-yaml-for-existing-resource)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [Selectors: equality-based and set-based](#selectors-equality-based-and-set-based)
 - [OpenLens and K8s from Docker Desktop](#openlens-and-k8s-from-docker-desktop)
@@ -780,6 +781,12 @@ service "ps-nodeport" deleted
 kubectl config get-contexts
 kubectl config use-context docker-desktop
 kubectl config current-context
+```
+
+## kubectl get yaml for existing resource
+
+```
+kubectl get ingressclass -A -o yaml
 ```
 
 # Kubernetes dashboard

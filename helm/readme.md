@@ -13,7 +13,7 @@
 - [install, upgrade, rollback](#install-upgrade-rollback)
   - [chart1](#chart1)
   - [chart2](#chart2)
-  - [chart 3](#chart-3)
+  - [chart3](#chart3)
   - [chart 4 - INGRESS controller](#chart-4---ingress-controller)
 - [Customizing charts with helm templates](#customizing-charts-with-helm-templates)
   - [Testing custom templates](#testing-custom-templates)
@@ -293,13 +293,15 @@ REVISION        UPDATED                         STATUS          CHART           
 3               Thu Dec  8 12:52:14 2022        deployed        guestbook-0.1.0 1.0             Rollback to 1
 ```
 
-## chart 3
+## chart3
 
 Chart 3 contains classic example with front-end, back-end and database.
 
 [chart3](charts/chart3/chart/guestbook)
 
 chart 3 adds back-end and database.
+
+>NOTE: this chart contains comments explaining purpose of selected fields from yaml file.
 
 *version* field in main *Chart.yaml* is updated to 1.1.0 because there are changes in infrastructure.
 
@@ -373,21 +375,56 @@ Sample response: `[{"_id":"6391d4658ff56f16834870f5","name":"Jacek","message":"P
 
 [chart4](charts/chart4/chart/guestbook)
 
-First we have to install ingress controller
+* Install ingress controller
+
+>NOTE: Before installation check if port 80 is already used (type localhost in web browser). If it is used
+disable/uninstall processes which listen on this port, for example it might be required to uninstall IIS in Windows, restart might be required.
+
 https://kubernetes.github.io/ingress-nginx/deploy/#using-helm
+
+Add repo
 ```
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm install release-ingress ingress-nginx/ingress-nginx
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart4\chart> helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+"ingress-nginx" already exists with the same configuration, skipping
+```
+
+Install ingress controller
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart4\chart> helm install release-ingress ingress-nginx/ingress-nginx
+NAME: release-ingress
+LAST DEPLOYED: Wed Dec 21 11:54:22 2022
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+The ingress-nginx controller has been installed.
+It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status by running 'kubectl --namespace default get services -o wide -w release-ingress-ingress-nginx-controller'
+```
+
+Check the status
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart4\chart> kubectl --namespace default get services -o wide -w release-ingress-ingress-nginx-controller
+NAME                                       TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)                      AGE    SELECTOR
+release-ingress-ingress-nginx-controller   LoadBalancer   10.97.29.58   localhost     80:31950/TCP,443:32090/TCP   2m7s   app.kubernetes.io/component=controller,app.kubernetes.io/instance=release-ingress,app.kubernetes.io/name=ingress-nginx
 ```
 
 After this we can see that nginx server is running:
 
 ![ingress-nginx-empty](images/ingress-nginx-empty.png)
 
-Next we can release a package that uses ingress controller.
+
+* Install a package that uses ingress controller.
 
 ```
-helm install demoguestbook guestbook
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart4\chart> helm install demoguestbook guestbook
+NAME: demoguestbook
+LAST DEPLOYED: Wed Dec 21 12:15:48 2022
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
 ```
 
 After this we have to add entries to *C:\Windows\System32\drivers\etc\hosts*
@@ -400,10 +437,13 @@ to have mapping between DNS names and localhost address.
 
 This names are also used in [ingress.yaml](charts/chart4/chart/guestbook/charts/frontend/templates/ingress.yaml).
 
-Finally we can open the UI in web browser:
+Finally we can open the UI in web browser using http://frontend.local/
 
 ![app-frontend.local](images/app-frontend.local.png)
 
+>NOTE: if the page does not work check the logs from the ingress controller. Find it on list of pods and read the logs.
+
+![ingress-controller-logs.png](images/ingress-controller-logs.png)
 
 # Customizing charts with helm templates
 
