@@ -420,6 +420,8 @@ PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart4\chart> helm uninstall release
 release "release-ingress" uninstalled
 ```
 
+>NOTE: **all services in this example are `ClusterIP` so it means that ingress controller can access services of such type.**
+
 
 * Install a package that uses ingress controller.
 
@@ -671,7 +673,8 @@ type: library
 
 [chart5](charts/chart5-customizing-charts/chart/guestbook)
 
-This chart show simple usage of custom values. It does not fully work because backend chart uses not working connection string to mongodb.
+This chart show simple usage of custom values. Additionally now `ingress.yaml` is placed in frontend and backend charts.
+It does not fully work because backend chart uses not working connection string to mongodb.
 
 We can run `helm template guestbook` or `helm install demogeustbook guestbook --debug --dry-run` to see how look all yaml
 files after applying all custom values.
@@ -755,6 +758,9 @@ release "demoguestbook" uninstalled
 [chart6](charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook)
 
 This chart solves problem that occurred in chart 5 - incorrect connection string to mongodb.
+In [backend-secret.yaml](./charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook/charts/backend/templates/backend-secret.yaml) is defined correct connection string.
+
+Additionally...
 It uses [_helpers.tpl](./charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook/charts/backend/templates/_helpers.tpl) to determine name which should be used in mongodb connection string (URI).
 
 ## chart 7 - installing DEV and TEST environment
