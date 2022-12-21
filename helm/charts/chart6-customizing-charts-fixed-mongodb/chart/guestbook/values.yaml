@@ -3,3 +3,6 @@ backend:
     mongodb_uri:
       username: admin
       password: password
+  fullnameOverride: my-test-backend
+database:
+  fullnameOverride: my-test-database

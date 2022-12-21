@@ -801,8 +801,8 @@ data:
 and the value after decoding is: `mongodb://admin:password@demogeustbook-database:/guestbook?authSource=admin`.
 
 
-Additionally...
-It uses [_helpers.tpl](./charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook/charts/backend/templates/_helpers.tpl) to determine name which should be used in mongodb connection string (URI).
+Additionally in this chart is used [_helpers.tpl](./charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook/charts/backend/templates/_helpers.tpl). It allows specify in main chart [values.yaml](./charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook/values.yaml) field `fullnameOverride` with selected name which later will be used as names for selected K8s objects.
+**Setting it for `database` package is not supported** because connection string in `backend` package is always constructed the same way, [it does not use](./charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook/charts/backend/templates/backend-secret.yaml#L7) `fullnameOverride`.
 
 ```
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart6-customizing-charts-fixed-mongodb\chart> helm install
