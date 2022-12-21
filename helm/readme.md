@@ -420,7 +420,8 @@ PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart4\chart> helm uninstall release
 release "release-ingress" uninstalled
 ```
 
->NOTE: **all services in this example are `ClusterIP` so it means that ingress controller can access services of such type.**
+>NOTE: **all services in this example are `ClusterIP` so it means that ingress controller can access services of such type.
+Previous examples chart1, chart2, chart3 use `NodePort` because ingress controller is not used there**
 
 
 * Install a package that uses ingress controller.
