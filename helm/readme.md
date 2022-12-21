@@ -826,8 +826,7 @@ Some important points:
   * [main chart ingress](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml) - it is used by default
   * [frontend ingress](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/charts/frontend/templates/ingress.yaml) - by      default disabled
   * [backend ingress](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/charts/backend/templates/ingress.yaml) - by default disabled
-* This chart shows how to generate app URL based on release name.   
-  [ingress.yaml](/charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml) by setting host in this way: ```host: {{ $.Release.Name }}.{{ .host.domain }}```
+* This chart shows how to [generate app URL](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml#L4) based on release name
 * This chart contains example how to [iterate through array](charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml).
 * It shows how to override values from values.yaml by parent chart (sections backend and frontend from [values.yaml](charts/chart7-DEV-and-TEST-environment/chart/guestbook/values.yaml))
 
