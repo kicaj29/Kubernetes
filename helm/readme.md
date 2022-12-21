@@ -822,10 +822,12 @@ After installation we can use again the web app using address `http://frontend.l
 [chart7](charts/chart7-DEV-and-TEST-environment/chart/guestbook)
 
 Some important points:
+* It contains ingress definitions in 3 places:
+  * [main chart ingress](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml) - it is used by default
+  * [frontend ingress](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/charts/frontend/templates/ingress.yaml) - by      default disabled
+  * [backend ingress](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/charts/backend/templates/ingress.yaml) - by default disabled
 * This chart shows how to generate app URL based on release name.   
   [ingress.yaml](/charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml) by setting host in this way: ```host: {{ $.Release.Name }}.{{ .host.domain }}```
-* It contains one ingress definition.   
-  [ingress.yaml](/charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml) - if needed we can enable ingress.yaml for frontend and backend in [values.yaml](/charts/chart7-DEV-and-TEST-environment/chart/guestbook/values.yaml).
 * This chart contains example how to [iterate through array](charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml).
 * It shows how to override values from values.yaml by parent chart (sections backend and frontend from [values.yaml](charts/chart7-DEV-and-TEST-environment/chart/guestbook/values.yaml))
 
