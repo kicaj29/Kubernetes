@@ -708,7 +708,7 @@ data:
 ```
 
 It is incorrect because now mongodb service has dynamic name and it is not hardcoded to `mongodb` anymore.
-For this test tun it is:
+For this test run it is:
 
 backend-service.yaml
 ```yaml
@@ -723,7 +723,26 @@ metadata:
 
 It means that after installing this chart it will not work. This problem is solved in chart 6.
 
-![not-working-backend](images/not-working-backend.png)
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart5-customizing-charts\chart> helm install demoguestbook guestbook
+NAME: demoguestbook
+LAST DEPLOYED: Wed Dec 21 14:37:07 2022
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+```
+
+Logs from backend pod
+```
+Guestbook API listening on port 3000!
+/home/node/app/node_modules/mongodb/lib/topologies/server.js:240
+            throw err;
+            ^
+
+Error: connect ECONNREFUSED 104.45.152.13:27017
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1191:14)
+```
 
 
 ## chart 6 - logic with building connection string to mongodb
