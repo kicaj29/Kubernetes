@@ -414,6 +414,12 @@ After this we can see that nginx server is running:
 
 ![ingress-nginx-empty](images/ingress-nginx-empty.png)
 
+If necessary we can uninstall ingress controller
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart4\chart> helm uninstall release-ingress
+release "release-ingress" uninstalled
+```
+
 
 * Install a package that uses ingress controller.
 

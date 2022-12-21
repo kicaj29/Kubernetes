@@ -4,4 +4,7 @@ kind: IngressClass
 metadata:
   name: my-nginx
 spec:
-  controller: k8s.io/ingress-nginx # use your controller name.
+  controller: k8s.io/ingress-nginx # use your controller name. 
+  # https://github.com/kubernetes/ingress-nginx/blob/main/internal/k8s/main.go#L126
+  # https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx
+  # controller.ingressClassResource.controllerValue, default value is "k8s.io/ingress-nginx"
