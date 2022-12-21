@@ -672,11 +672,59 @@ type: library
 [chart5](charts/chart5-customizing-charts/chart/guestbook)
 
 This chart show simple usage of custom values. It does not fully work because backend chart uses not working connection string to mongodb.
-The connection string is not correct because not mongodb has dynamic name.
+
+We can run `helm template guestbook` or `helm install demogeustbook guestbook --debug --dry-run` to see how look all yaml
+files after applying all custom values.
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart5-customizing-charts\chart> helm install demogeustbook
+ guestbook --debug --dry-run                                                                           
+install.go:192: [debug] Original chart version: ""                                                     
+install.go:209: [debug] CHART PATH: D:\GitHub\kicaj29\Kubernetes\helm\charts\chart5-customizing-charts\
+chart\guestbook                                                                                        
+```
+
+In the output from the above command we can read that backend pod set env. variable `MONGODB_URI` to incorrect URI:
+
+backend.yaml
+```yaml
+        env:
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: demogeustbook-backend-secret
+              key: mongodb-uri
+```
+
+backend-secret.yaml
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: demogeustbook-backend-secret
+data:
+  mongodb-uri: bW9uZ29kYjovL2FkbWluOnBhc3N3b3JkQG1vbmdvZGI6MjcwMTcvZ3Vlc3Rib29rP2F1dGhTb3VyY2U9YWRtaW4=  
+  # mongodb://admin:password@mongodb:27017/guestbook?authSource=admin 
+```
+
+It is incorrect because now mongodb service has dynamic name and it is not hardcoded to `mongodb` anymore.
+For this test tun it is:
+
+backend-service.yaml
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: demogeustbook-backend
+  name: demogeustbook-backend
+...
+```
+
+It means that after installing this chart it will not work. This problem is solved in chart 6.
 
 ![not-working-backend](images/not-working-backend.png)
 
-This problem is solved in chart 6.
 
 ## chart 6 - logic with building connection string to mongodb
 
