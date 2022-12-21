@@ -827,7 +827,7 @@ Some important points:
   * [frontend ingress](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/charts/frontend/templates/ingress.yaml) - by      default disabled
   * [backend ingress](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/charts/backend/templates/ingress.yaml) - by default disabled
 * This chart shows how to [generate app URL](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml#L4) based on release name
-* This chart contains example how to [iterate through array](charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml).
+* This chart contains example how to [iterate through array](./charts/chart7-DEV-and-TEST-environment/chart/guestbook/templates/ingress.yaml#L7).
 * It shows how to override values from values.yaml by parent chart (sections backend and frontend from [values.yaml](charts/chart7-DEV-and-TEST-environment/chart/guestbook/values.yaml))
 
 >NOTE: the following example requires adding additional entries in *C:\Windows\System32\drivers\etc\hosts*   
