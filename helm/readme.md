@@ -754,7 +754,8 @@ release "demoguestbook" uninstalled
 
 [chart6](charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook)
 
-This chart solves problem that occurred in chart 5 - incorrect connection string to mongodb. 
+This chart solves problem that occurred in chart 5 - incorrect connection string to mongodb.
+It uses [_helpers.tpl](./charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook/charts/backend/templates/_helpers.tpl) to determine name which should be used in mongodb connection string (URI).
 
 ## chart 7 - installing DEV and TEST environment
 
