@@ -403,6 +403,25 @@ It may take a few minutes for the LoadBalancer IP to be available.
 You can watch the status by running 'kubectl --namespace default get services -o wide -w release-ingress-ingress-nginx-controller'
 ```
 
+It will create the following objects
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart4\chart> kubectl get all
+NAME                                                            READY   STATUS    RESTARTS   AGE
+pod/release-ingress-ingress-nginx-controller-5fc8454c57-lsrrq   1/1     Running   0          23s
+
+NAME                                                         TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+service/kubernetes                                           ClusterIP      10.96.0.1       <none>        443/TCP                      13d
+service/release-ingress-ingress-nginx-controller             LoadBalancer   10.98.17.143    localhost     80:31218/TCP,443:32415/TCP   23s
+service/release-ingress-ingress-nginx-controller-admission   ClusterIP      10.104.98.122   <none>        443/TCP                      23s
+
+NAME                                                       READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/release-ingress-ingress-nginx-controller   1/1     1            1           23s
+
+NAME                                                                  DESIRED   CURRENT   READY   AGE
+replicaset.apps/release-ingress-ingress-nginx-controller-5fc8454c57   1         1         1       23s
+```
+
+
 Check the status
 ```
 PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart4\chart> kubectl --namespace default get services -o wide -w release-ingress-ingress-nginx-controller
@@ -421,7 +440,7 @@ release "release-ingress" uninstalled
 ```
 
 >NOTE: **all services in this example are `ClusterIP` so it means that ingress controller can access services of such type.
-Previous examples chart1, chart2, chart3 use `NodePort` because ingress controller is not used there**
+Previous examples chart1, chart2, chart3 use `NodePort` because ingress controller is not used there.**
 
 
 * Install a package that uses ingress controller.
@@ -761,8 +780,42 @@ release "demoguestbook" uninstalled
 This chart solves problem that occurred in chart 5 - incorrect connection string to mongodb.
 In [backend-secret.yaml](./charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook/charts/backend/templates/backend-secret.yaml) is defined correct connection string.
 
+In dry run output:
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart6-customizing-charts-fixed-mongodb\chart> helm install demogeustbook guestbook --debug --dry-run
+install.go:192: [debug] Original chart version: ""
+install.go:209: [debug] CHART PATH: D:\GitHub\kicaj29\Kubernetes\helm\charts\chart6-customizing-charts-fixed-mongodb\chart\guestbook
+```
+
+we can see that correct connection string is generated in [backend-secret.yaml](./charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook/charts/backend/templates/backend-secret.yaml)
+```yaml
+apiVersion: v1                                                                                         
+kind: Secret                                                                                           
+metadata:                                                                                              
+  name: demogeustbook-backend-secret                                                                   
+data:                                                                                                  
+  mongodb-uri: "bW9uZ29kYjovL2FkbWluOnBhc3N3b3JkQGRlbW9nZXVzdGJvb2stZGF0YWJhc2U6L2d1ZXN0Ym9vaz9hdXRoU29
+1cmNlPWFkbWlu"
+```
+
+and the value after decoding is: `mongodb://admin:password@demogeustbook-database:/guestbook?authSource=admin`.
+
+
 Additionally...
 It uses [_helpers.tpl](./charts/chart6-customizing-charts-fixed-mongodb/chart/guestbook/charts/backend/templates/_helpers.tpl) to determine name which should be used in mongodb connection string (URI).
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart6-customizing-charts-fixed-mongodb\chart> helm install
+ demogeustbook guestbook                                                                               
+NAME: demogeustbook                                                                                    
+LAST DEPLOYED: Wed Dec 21 16:00:57 2022                                                                
+NAMESPACE: default                                                                                     
+STATUS: deployed                                                                                       
+REVISION: 1                                                                                            
+TEST SUITE: None                                                                                       
+```
+
+After installation we can use again the web app using address `http://frontend.local/`.
 
 ## chart 7 - installing DEV and TEST environment
 
