@@ -45,7 +45,7 @@
         - [Execute update](#execute-update)
         - [Execute rollback - use previous replica set](#execute-rollback---use-previous-replica-set)
         - [Removing deployment](#removing-deployment)
-  - [Example 02: select current context](#example-02-select-current-context)
+  - [kubectl context](#kubectl-context)
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [Selectors: equality-based and set-based](#selectors-equality-based-and-set-based)
 - [OpenLens and K8s from Docker Desktop](#openlens-and-k8s-from-docker-desktop)
@@ -774,13 +774,12 @@ PS D:\GitHub\kicaj29\Kubernetes\example01-deploy-update-rollback\Deployments> ku
 service "ps-nodeport" deleted
 ```
 
-## Example 02: select current context
-
-To connect to particular K8s use command (in this case it is K8s inside docker desktop):
+## kubectl context
 
 ```
-PS D:\> kubectl config use-context docker-desktop
-Switched to context "docker-desktop".
+kubectl config get-contexts
+kubectl config use-context docker-desktop
+kubectl config current-context
 ```
 
 # Kubernetes dashboard
