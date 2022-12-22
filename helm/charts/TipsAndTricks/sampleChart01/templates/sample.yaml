@@ -12,11 +12,16 @@
 {{- end }}
 customer:
 ## first param is template name and second param is a scope of the passed context, if we want pass the whole context use dot:
+## template is part of the core Go text/template language. 
+## It always renders its results to the template output;
+## it does not produce a value and its result cannot be captured in a variable or included in a pipeline.
   {{- template "mychart.labels" . }} 
 ## here we narrow the scope of .Values.personal:
 person:
   {{- template "mychart.labels1" .Values.personal }}
 ## if we want do some processing with the template then we have to use include function instead of template
+## include is a Helm extension. It captures the template output and returns it as a string.
+## Its result can be used the same way as any other support function call, for example we can use pipeline with indent.
 personHelpers:
   {{- include "mychart.labels1Helpers" .Values.personal | indent 5 }}
 ## if we want do some processing with the template then we have to use include function instead of template
