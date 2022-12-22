@@ -14,4 +14,5 @@ service:
   port: 80
 ingress:
   enabled: true
-  host: backend.minikube.local
+  host: backend.local
+  main_chart_name: guestbook

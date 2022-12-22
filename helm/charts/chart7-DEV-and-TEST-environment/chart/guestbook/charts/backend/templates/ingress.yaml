@@ -1,15 +1,21 @@
 {{- if .Values.ingress.enabled }}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "backend.fullname" . }}-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: {{ .Release.Name }}-{{ .Values.ingress.main_chart_name }}-my-nginx # ingress class is defined in the main chart so here we have to use this name
   rules:
   - host: {{ .Values.ingress.host }}
     http:
       paths:
-      - path: /
+      - pathType: Prefix
+        path: /
         backend:
-          serviceName: {{ include "backend.fullname" . }} 
-          servicePort: 80
+          service:    
+            name: {{ include "backend.fullname" . }}
+            port:
+              number: 80
 {{- end }}

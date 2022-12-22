@@ -836,16 +836,17 @@ Some important points:
 ```127.0.0.1 test.frontend.local```   
 ```127.0.0.1 test.backend.local```
 
+
 ```ps
 helm install dev guestbook --set frontend.config.guestbook_name=DEV
 helm install test guestbook --set frontend.config.guestbook_name=TEST
 ```
 
-Sample execution:
+* Sample execution:
 ```
-PS D:\GitHub\kicaj29\helm\charts\chart7-DEV-and-TEST-environment\chart> helm install dev guestbook --set frontend.config.guestbook_name=DEV
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart7-DEV-and-TEST-environment\chart> helm install dev guestbook --set frontend.config.guestbook_name=DEV
 NAME: dev
-LAST DEPLOYED: Wed Sep 23 15:10:40 2020
+LAST DEPLOYED: Thu Dec 22 09:55:47 2022
 NAMESPACE: default
 STATUS: deployed
 REVISION: 1
@@ -858,60 +859,34 @@ You can access the Guestbook application at the following urls :
   http://dev.frontend.local
   http://dev.backend.local
 Have fun !
-PS D:\GitHub\kicaj29\helm\charts\chart7-DEV-and-TEST-environment\chart> helm install test guestbook --set frontend.config.guestbook_name=TEST
-NAME: test
-LAST DEPLOYED: Wed Sep 23 15:18:14 2020
-NAMESPACE: default
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
-NOTES:
-Congratulations ! You installed guestbook chart sucessfully.
-Release name is test
-
-You can access the Guestbook application at the following urls :
-  http://test.frontend.local
-  http://test.backend.local
-Have fun !
-PS D:\GitHub\kicaj29\helm\charts\chart7-DEV-and-TEST-environment\chart> kubectl get pods
-NAME                                                       READY   STATUS    RESTARTS   AGE
-dev-backend-78995fd9f5-8kqx9                               1/1     Running   2          9m48s
-dev-database-86587b7845-v76w8                              1/1     Running   0          9m48s
-dev-frontend-749bd48bcf-6n7xt                              1/1     Running   0          9m48s
-release-ingress-ingress-nginx-controller-c6bb978f7-gwvxt   1/1     Running   0          6h1m
-test-backend-5b7cbcd488-pl8pt                              1/1     Running   2          2m14s
-test-database-69d589bc8-r8q7m                              1/1     Running   0          2m14s
-test-frontend-869cfcd845-rn7mc                             1/1     Running   0          2m14s
 ```
 
 >NOTE: if some pods will start crashing increase CPU and memory assigned to docker engine in docker desktop settings.
 
-We can also experiment and enable ingress also for frontend and backend. Then frontend app  will be available from 2 DNS names:
+* We can also experiment and enable ingress also for frontend and backend. Then frontend app will be available from 2 DNS names:
+
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart7-DEV-and-TEST-environment\chart> helm upgrade dev guestbook --set frontend.config.guestbook_name=DEV --set frontend.ingress.enabled=true --set backend.ingress.enabled=true
 
 ```
-PS D:\GitHub\kicaj29\helm\charts\chart7-DEV-and-TEST-environment\chart> helm install test1 guestbook --set frontend.config.guestbook_name=TEST1
-NAME: test1
-LAST DEPLOYED: Wed Sep 23 15:22:34 2020
-NAMESPACE: default
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
-NOTES:
-Congratulations ! You installed guestbook chart sucessfully.
-Release name is test1
+PS D:\GitHub\kicaj29\Kubernetes\helm\charts\chart7-DEV-and-TEST-environment\chart> helm upgrade dev guestbook --set frontend.config.guestbook_name=DEV --se
+t frontend.ingress.enabled=true --set backend.ingress.enabled=true                                                                                         
+Release "dev" has been upgraded. Happy Helming!                                                                                                         
+NAME: dev                                                                                                                                   
+LAST DEPLOYED: Thu Dec 22 09:58:45 2022                                                                                          
+NAMESPACE: default                                                                                                                      
+STATUS: deployed                                                                                                                    
+REVISION: 2                                                                                                                                  
+TEST SUITE: None  
+NOTES:                                                                                                                                      Congratulations ! You installed guestbook chart sucessfully. 
+Release name is dev
 
-You can access the Guestbook application at the following urls :
-  http://test1.frontend.local
-  http://test1.backend.local
-Have fun !
+You can access the Guestbook application at the following urls :                                                                        
+  http://dev.frontend.local                                                                                                        
+  http://dev.backend.local                                                                             
+Have fun !                                                                                                                       
 ```
 
-```
-http://test1.frontend.local
-http://frontend.local/
-```
-Address ```http://frontend.local/``` is not mentioned in 
-[NOTES.txt](charts\chart7-DEV-and-TEST-environment\chart\guestbook\templates\NOTES.txt) that`s why it is not listed in the ```helm install``` output.
+Now we can access using `http://frontend.local/` (frontend ingress) and `http://dev.frontend.local/` (main chart ingress).
 
 # Managing dependencies
 ## Packaging charts
