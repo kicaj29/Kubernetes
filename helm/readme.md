@@ -1033,6 +1033,17 @@ helm template -f .\sampleChart01\valuesBob.yaml  .\sampleChart01\
 
 **{{-** indicates that whitespace should be chomped left whereas **-}}** means whitespace to the right should be consumed.
 
+For example if we have such code snippet:
+```yaml
+{{- define "mychart.labels1Helpers" }}
+  labels:
+    fullName: {{ .name }} {{ .secondName }}
+    country: {{ .country }}
+{{- end }}
+```
+after processing it, lines `{{- define "mychart.labels1Helpers" }}` and `{{- end }}` will disappear but to remove also new line characters 
+we use dash to not have empty lines in the final output.
+
 ```
 helm template -f .\sampleChart02\Values.yaml sampleChart02
 ```
