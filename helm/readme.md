@@ -1068,15 +1068,15 @@ customer1:
 ```
 
 ```yaml
-{{ define "mychart.labels" }}
+{{ define "mychart.labels" -}}
   labels:
     fullName: {{ .Values.personal.name }} {{ .Values.personal.secondName }}
-    country: {{ .Values.personal.country }}
+    country: {{ .Values.personal.country -}}
 {{ end }}
 customer:
-  {{- template "mychart.labels" . -}}
+  {{ template "mychart.labels" . }}
 customer1:
-  {{- template "mychart.labels" . }}
+  {{ template "mychart.labels" . }}
 ```
 
 Be careful with using **dash** because incorrect usage causes that generated yaml is incorrect, for example this yaml will generated incorrect out yaml file:
