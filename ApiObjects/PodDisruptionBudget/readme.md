@@ -51,7 +51,9 @@ If you just have a `Replicaset` with one replica and no `PodDisruptionBudget` sp
 the pod will be terminated and a new pod will be created on other nodes.
 This is where `PDBs` provide the added advantage over the `Replicaset`.
 
-**For the `PodDisruptionBudget` to work, there must be at least 2 pods running for a label selector otherwise, the node cannot be drained gracefully and it will be evicted forcefully when grace time ends.**
+**If `PodDisruptionBudget` allows 0 disruptions then it will not be possible to drain the node. For example if we have deployment with 3 replicas each deployed on different node (we have 3 nodes) then we will not be able drain any node. Sample message:**
+
+![01-cannot-evict-pod.png](images/01-cannot-evict-pod.png)
 
 
 
@@ -59,3 +61,4 @@ This is where `PDBs` provide the added advantage over the `Replicaset`.
 https://innablr.com.au/blog/what-is-pod-disruption-budget-in-k8s-and-why-to-use-it/
 https://dwdraju.medium.com/poddisruptionbudget-a-key-for-zero-downtime-c478d056e373
 https://stackoverflow.com/questions/66227319/kubernetes-replicaset-vs-poddisruptionbudget
+https://www.youtube.com/watch?v=e2HjRrmXMDw GOOD!!!
