@@ -57,10 +57,37 @@ info: Microsoft.Hosting.Lifetime[0]
 
 Next test if the web api is available
 
-http://localhost:4200/weatherforecast
+http://localhost:4200/weatherforecast   
 http://localhost:4200/swagger
 
 
-# Create helm package
+# Create and update helm package
 
 `helm create FancyMicroserviceHelmPackage`
+
+# Verify k8s connection settings
+
+```
+kubectl config get-contexts
+kubectl config use-context docker-desktop
+kubectl config current-context
+```
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> kubectl get nodes
+NAME             STATUS   ROLES           AGE   VERSION
+docker-desktop   Ready    control-plane   64s   v1.25.4
+```
+
+>NOTE: if the K8s is not available `PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> kubectl get nodes
+Unable to connect to the server: EOF` try to use `Reset Kubernetes Cluster` option.
+![01-reset-k8s.png](./images/01-reset-k8s.png)
+
+`helm` uses the same settings as `kubectl`.
+
+# Verify helm package before deployment
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm template FancyMicroserviceHelmPackage
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm install fancy-ms FancyMicroserviceHelmPackage --debug --dry-run
+```
+
