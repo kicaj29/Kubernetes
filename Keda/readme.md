@@ -3,6 +3,9 @@
 - [Create and update helm package](#create-and-update-helm-package)
 - [Verify k8s connection settings](#verify-k8s-connection-settings)
 - [Verify helm package before deployment](#verify-helm-package-before-deployment)
+- [Install fancy-ms chart](#install-fancy-ms-chart)
+- [Call fancy-ms](#call-fancy-ms)
+- [Install new version of the chart to fix problem with health checks](#install-new-version-of-the-chart-to-fix-problem-with-health-checks)
 
 # Docker login
 
@@ -69,7 +72,7 @@ http://localhost:4200/swagger
 
 # Create and update helm package
 
-`helm create FancyMicroserviceHelmPackage`
+`helm create fancy-micro-service-helm-package`
 
 # Verify k8s connection settings
 
@@ -93,7 +96,84 @@ Unable to connect to the server: EOF` try to use `Reset Kubernetes Cluster` opti
 # Verify helm package before deployment
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes\Keda> helm template FancyMicroserviceHelmPackage
-PS D:\GitHub\kicaj29\Kubernetes\Keda> helm install fancy-ms FancyMicroserviceHelmPackage --debug --dry-run
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm template fancy-micro-service-helm-package
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm install fancy-ms fancy-micro-service-helm-package --debug --dry-run
 ```
 
+If the chart already exist uninstall it:
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm uninstall fancy-ms
+release "fancy-ms" uninstalled
+```
+
+# Install fancy-ms chart
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm install fancy-ms fancy-micro-service-helm-package
+NAME: fancy-ms
+LAST DEPLOYED: Wed Jul 26 15:26:47 2023
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+NOTES:
+1. Get the application URL by running these commands:
+  export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services fancy-ms-fancy-micro-service-helm-package)
+  export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+```
+
+# Call fancy-ms
+
+Because by default helm chart uses `livenessProbe` and `readinessProbe` the pod fails to start.
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> kubectl get pods
+NAME                                                         READY   STATUS             RESTARTS      AGE
+fancy-ms-fancy-micro-service-helm-package-76bb66974b-j2qgv   0/1     CrashLoopBackOff   5 (84s ago)   5m4s
+```
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> kubectl describe pod fancy-ms-fancy-micro-service-helm-package-76bb66974b-j2qgv
+...
+Events:
+  Type     Reason     Age                    From               Message
+  ----     ------     ----                   ----               -------
+  Normal   Scheduled  4m22s                  default-scheduler  Successfully assigned default/fancy-ms-fancy-micro-service-helm-package-76bb66974b-j2qgv to docker-desktop
+  Normal   Pulled     3m51s (x2 over 4m21s)  kubelet            Container image "kicaj29/fancymicroservice:v1" already present on machine
+  Normal   Created    3m51s (x2 over 4m21s)  kubelet            Created container fancy-micro-service-helm-package
+  Normal   Started    3m51s (x2 over 4m21s)  kubelet            Started container fancy-micro-service-helm-package
+  Warning  Unhealthy  3m51s (x2 over 4m20s)  kubelet            Readiness probe failed: Get "http://10.1.0.106:80/": dial tcp 10.1.0.106:80: connect: connection refused
+  Warning  Unhealthy  3m22s (x9 over 4m19s)  kubelet            Readiness probe failed: HTTP probe failed with statuscode: 404
+  Warning  Unhealthy  3m22s (x6 over 4m12s)  kubelet            Liveness probe failed: HTTP probe failed with statuscode: 404
+  Normal   Killing    3m22s (x2 over 3m52s)  kubelet            Container fancy-micro-service-helm-package failed liveness probe, will be restarted
+```
+
+To fix this problem necessary logic was added to the micro-service and the helm chart was updated to point correct urls.
+
+# Install new version of the chart to fix problem with health checks
+
+* Build new image with endpoint for health checks
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> docker build -f Dockerfile -t kicaj29/fancymicroservice:v2 ..
+```
+
+* Uninstall previous version
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm uninstall fancy-ms
+release "fancy-ms" uninstalled
+```
+
+* Install new version
+```
+helm install fancy-ms fancy-micro-service-helm-package
+NAME: fancy-ms
+LAST DEPLOYED: Wed Jul 26 16:23:36 2023
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+NOTES:
+1. Get the application URL by running these commands:
+  export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services fancy-ms-fancy-micro-service-helm-package)
+  export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+```

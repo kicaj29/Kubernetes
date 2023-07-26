@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "FancyMicroserviceHelmPackage.fullname" . }}
+  name: {{ include "fancy-micro-service-helm-package.fullname" . }}
   labels:
-    {{- include "FancyMicroserviceHelmPackage.labels" . | nindent 4 }}
+    {{- include "fancy-micro-service-helm-package.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "FancyMicroserviceHelmPackage.selectorLabels" . | nindent 6 }}
+      {{- include "fancy-micro-service-helm-package.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "FancyMicroserviceHelmPackage.selectorLabels" . | nindent 8 }}
+        {{- include "fancy-micro-service-helm-package.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "FancyMicroserviceHelmPackage.serviceAccountName" . }}
+      serviceAccountName: {{ include "fancy-micro-service-helm-package.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -39,12 +39,20 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /health/live
               port: http
+            initialDelaySeconds: 6
+            periodSeconds: 8
+            successThreshold: 1
+            failureThreshold: 1 
           readinessProbe:
             httpGet:
-              path: /
+              path: /health/ready
               port: http
+            initialDelaySeconds: 6
+            periodSeconds: 8
+            successThreshold: 1
+            failureThreshold: 1 
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
