@@ -149,7 +149,7 @@ Events:
   Normal   Killing    3m22s (x2 over 3m52s)  kubelet            Container fancy-micro-service-helm-package failed liveness probe, will be restarted
 ```
 
-To fix this problem necessary logic was added to the micro-service and the helm chart was updated to point correct urls.
+To fix this problem necessary logic was added to the micro-service and the helm chart was updated to point correct urls and adjusted settings: `initialDelaySeconds`, `periodSeconds`, `successThreshold`, `failureThreshold`.
 
 # Install new version of the chart to fix problem with health checks
 
