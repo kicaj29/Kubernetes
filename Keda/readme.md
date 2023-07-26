@@ -1,3 +1,9 @@
+- [Docker login](#docker-login)
+- [Build docker image and test it](#build-docker-image-and-test-it)
+- [Create and update helm package](#create-and-update-helm-package)
+- [Verify k8s connection settings](#verify-k8s-connection-settings)
+- [Verify helm package before deployment](#verify-helm-package-before-deployment)
+
 # Docker login
 
 ```
