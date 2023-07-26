@@ -153,7 +153,7 @@ To fix this problem necessary logic was added to the micro-service and the helm 
 
 # Install new version of the chart to fix problem with health checks
 
-* Build new image with endpoint for health checks
+* Build new image with endpoint for the health checks
 ```
 PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> docker build -f Dockerfile -t kicaj29/fancymicroservice:v2 ..
 ```
@@ -189,7 +189,7 @@ fancy-ms-fancy-micro-service-helm-package   NodePort    10.110.11.179   <none>  
 kubernetes                                  ClusterIP   10.96.0.1       <none>        443/TCP        96m
 ```
 
-Next call from Chrome local machine (use localhost and not CLUSTER-IP):
+Next call from Chrome local machine (use localhost and not CLUSTER-IP), this time it should work:
 
 ```
 http://localhost:30317/swagger/index.html
