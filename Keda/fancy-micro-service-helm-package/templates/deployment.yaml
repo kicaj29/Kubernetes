@@ -37,6 +37,9 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          env:
+          - name: ASPNETCORE_ENVIRONMENT
+            value: Development
           livenessProbe:
             httpGet:
               path: /health/live

@@ -6,6 +6,7 @@
 - [Install fancy-ms chart](#install-fancy-ms-chart)
 - [Call fancy-ms](#call-fancy-ms)
 - [Install new version of the chart to fix problem with health checks](#install-new-version-of-the-chart-to-fix-problem-with-health-checks)
+- [Call fancy-ms again](#call-fancy-ms-again)
 
 # Docker login
 
@@ -176,4 +177,21 @@ NOTES:
   export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services fancy-ms-fancy-micro-service-helm-package)
   export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
+```
+
+# Call fancy-ms again
+
+Check port of the service for fancy-ms
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> kubectl get services
+NAME                                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+fancy-ms-fancy-micro-service-helm-package   NodePort    10.110.11.179   <none>        80:30317/TCP   34s
+kubernetes                                  ClusterIP   10.96.0.1       <none>        443/TCP        96m
+```
+
+Next call from Chrome local machine (use localhost and not CLUSTER-IP):
+
+```
+http://localhost:30317/swagger/index.html
+http://localhost:30317/weatherforecast
 ```
