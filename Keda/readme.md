@@ -7,6 +7,9 @@
 - [Call fancy-ms](#call-fancy-ms)
 - [Install new version of the chart to fix problem with health checks](#install-new-version-of-the-chart-to-fix-problem-with-health-checks)
 - [Call fancy-ms again](#call-fancy-ms-again)
+- [Deploy Keda](#deploy-keda)
+- [Configure keda ScaledObject](#configure-keda-scaledobject)
+- [url: "http://{{ include "fancy-micro-service-helm-package.fullname" . }}:80/api/metrics/mongo-connections"](#url-http-include-fancy-micro-service-helm-packagefullname--80apimetricsmongo-connections)
 
 # Docker login
 
@@ -195,3 +198,33 @@ Next call from Chrome local machine (use localhost and not CLUSTER-IP), this tim
 http://localhost:30317/swagger/index.html
 http://localhost:30317/weatherforecast
 ```
+
+# Deploy Keda
+
+https://keda.sh/docs/2.11/deploy/#helm
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm repo add kedacore https://kedacore.github.io/charts
+"kedacore" has been added to your repositories
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "kedacore" chart repository
+...Successfully got an update from the "ingress-nginx" chart repository
+...Successfully got an update from the "stable" chart repository
+Update Complete. ⎈Happy Helming!⎈
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm install keda kedacore/keda --namespace keda --create-namespace
+NAME: keda
+LAST DEPLOYED: Wed Jul 26 18:06:51 2023
+NAMESPACE: keda
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+```
+
+# Configure keda ScaledObject
+
+https://keda.sh/docs/2.11/scalers/metrics-api/
+https://github.com/kedacore/keda-docs/blob/main/content/docs/2.0/scalers/metrics-api.md
+
+
+#        url: "http://{{ include "fancy-micro-service-helm-package.fullname" . }}:80/api/metrics/mongo-connections"

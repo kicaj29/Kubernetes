@@ -1,14 +1,14 @@
-# Default values for fancy-micro-service-helm-package.
+# Default values for custom-metrics-service-helm-package.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 image:
-  repository: kicaj29/fancymicroservice
+  repository: kicaj29/custom-metrics
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v10"
+  tag: "v1"
 
 imagePullSecrets: []
 nameOverride: ""
