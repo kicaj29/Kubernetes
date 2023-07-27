@@ -1,13 +1,13 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: http-scaled-object-mongo-connections
+  name: metrics-api-mongo-pool-size
   namespace: default
   labels:
-    deploymentName: deployment-scaled-object-mongo-connections
+    deploymentName: metrics-api-mongo-pool-size
 spec:
   scaleTargetRef:
-    name: fancy-ms-fancy-micro-service-helm-package
+    name: ms-scale-me
   pollingInterval: 5
   cooldownPeriod: 10
   minReplicaCount: 0
@@ -16,5 +16,5 @@ spec:
     - type: metrics-api
       metadata:
         targetValue: "2"
-        url: "http://custom-metrics-custom-metrics-service-helm-package.default.svc.cluster.local:80/api/metrics/mongo-connections"
+        url: "http://ms-custom-metrics.default.svc.cluster.local:80/api/metrics/mongo-connections"
         valueLocation: 'currentWaitingSize'

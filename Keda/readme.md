@@ -1,15 +1,18 @@
 - [Docker login](#docker-login)
-- [Build docker image and test it](#build-docker-image-and-test-it)
+- [Build docker images and test it](#build-docker-images-and-test-it)
 - [Create and update helm package](#create-and-update-helm-package)
 - [Verify k8s connection settings](#verify-k8s-connection-settings)
 - [Verify helm package before deployment](#verify-helm-package-before-deployment)
-- [Install fancy-ms chart](#install-fancy-ms-chart)
-- [Call fancy-ms](#call-fancy-ms)
-- [Install new version of the chart to fix problem with health checks](#install-new-version-of-the-chart-to-fix-problem-with-health-checks)
-- [Call fancy-ms again](#call-fancy-ms-again)
+- [Install both charts](#install-both-charts)
+- [Call both services](#call-both-services)
 - [Deploy Keda](#deploy-keda)
 - [Configure keda ScaledObject](#configure-keda-scaledobject)
-- [url: "http://{{ include "fancy-micro-service-helm-package.fullname" . }}:80/api/metrics/mongo-connections"](#url-http-include-fancy-micro-service-helm-packagefullname--80apimetricsmongo-connections)
+- [Deploy keda.yaml](#deploy-kedayaml)
+- [Review logs from keda-operator pod](#review-logs-from-keda-operator-pod)
+- [Review ScaledObject status in Custom Resources section in OpenLens](#review-scaledobject-status-in-custom-resources-section-in-openlens)
+- [Review logs from ms-custom-metrics in OpenLens](#review-logs-from-ms-custom-metrics-in-openlens)
+- [Increase metric value to scale-out the ms-scale-me pod](#increase-metric-value-to-scale-out-the-ms-scale-me-pod)
+- [Decrease metric value to scale-in the ms-scale-me pod](#decrease-metric-value-to-scale-in-the-ms-scale-me-pod)
 
 # Docker login
 
@@ -24,12 +27,12 @@ Logging in with your password grants your terminal complete access to your accou
 For better security, log in with a limited-privilege personal access token. Learn more at https://docs.docker.com/go/access-tokens/
 ```
 
-# Build docker image and test it
+# Build docker images and test it
 
 * Because we do not need HTTPS in this scenario and enabling it for `docker run` is a bit difficult (more [here](https://medium.com/@woeterman_94/docker-in-visual-studio-unable-to-configure-https-endpoint-f95727187f5f)) I decided to disable HTTPS. If HTTPS is not disable during container running the exception is thrown:
 
   ```
-  PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> docker run -e ASPNETCORE_URLS="https://+:443;http://+:80" -p 4031:443 -p 4032:80 kicaj29/fancymicroservice:v1
+  PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\ScaleMe> docker run -e ASPNETCORE_URLS="https://+:443;http://+:80" -p 4031:443 -p 4032:80 kicaj29/scale-me:v1
   Unhandled exception. System.InvalidOperationException: Unable to configure HTTPS endpoint. No server certificate was specified, and the default developer certificate could not be found or is out of date.
   To generate a developer certificate run 'dotnet dev-certs https'. To trust the certificate (Windows and macOS only) run 'dotnet dev-certs https --trust'.
   For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.
@@ -40,43 +43,69 @@ For better security, log in with a limited-privilege personal access token. Lear
   * In `Program.cs` comment out `app.UseHttpsRedirection();`
 
 * Build the image
-`PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> docker build -f Dockerfile -t kicaj29/fancymicroservice:v1 ..`
+`PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\ScaleMe> docker build -f Dockerfile -t kicaj29/scale-me:v1 ..`   
+`PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> docker build -f Dockerfile -t kicaj29/custom-metrics:v1 ..`
+
 More about building docker images using dockerfile created by VS can be found [here](https://learn.microsoft.com/en-us/visualstudio/containers/container-build?view=vs-2022#docker-build) and [here](https://stackoverflow.com/questions/72718492/cannot-run-docker-build-when-using-docker-setup-from-visual-studio).
 
 * Check if the image is on the list
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> docker images kicaj29/fancymicroservice
-REPOSITORY                  TAG       IMAGE ID       CREATED          SIZE
-kicaj29/fancymicroservice   v1        0f0ce5e57ce5   26 minutes ago   212MB
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> docker images kicaj29/scale-me
+REPOSITORY         TAG       IMAGE ID       CREATED         SIZE
+kicaj29/scale-me   v1        56c6cb4fc415   2 minutes ago   212MB
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> docker images kicaj29/custom-metrics
+REPOSITORY               TAG       IMAGE ID       CREATED          SIZE
+kicaj29/custom-metrics   v1        179d50275d84   29 seconds ago   212MB
 ```
 
-* Run the image
+* Run the images
 
 Set environment variable `ASPNETCORE_ENVIRONMENT` on `Development` to enable swagger page.
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> docker run -e ASPNETCORE_ENVIRONMENT=De
-velopment -p 4200:80 kicaj29/fancymicroservice:v1                                                                
-info: Microsoft.Hosting.Lifetime[14]                                                                             
-      Now listening on: http://[::]:80                                                                           
-info: Microsoft.Hosting.Lifetime[0]                                                                              
-      Application started. Press Ctrl+C to shut down.                                                            
-info: Microsoft.Hosting.Lifetime[0]                                                                              
-      Hosting environment: Development                                                                           
-info: Microsoft.Hosting.Lifetime[0]                                                                              
-      Content root path: /app/                                                                                   
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\ScaleMe> docker run -e ASPNETCORE_ENVIRONMENT=Development -p 4200:80 kicaj29/scale-me:v1
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://[::]:80
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /app/                                                                                
 ```
 
-Next test if the web api is available
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> docker run -e ASPNETCORE_ENVIRONMENT=Development -p 4201:80 kicaj
+29/custom-metrics:v1                                                                                                         
+info: Microsoft.Hosting.Lifetime[14]                                                                                         
+      Now listening on: http://[::]:80                                                                                       
+info: Microsoft.Hosting.Lifetime[0]                                                                                          
+      Application started. Press Ctrl+C to shut down.                                                                        
+info: Microsoft.Hosting.Lifetime[0]                                                                                          
+      Hosting environment: Development                                                                                       
+info: Microsoft.Hosting.Lifetime[0]                                                                                          
+      Content root path: /app/                                                                                               
+```
 
-http://localhost:4200/weatherforecast   
-http://localhost:4200/swagger
+Next we see that the web api is available
 
+http://localhost:4200/weatherforecast    
+http://localhost:4200/swagger    
+
+http://localhost:4201/swagger   
+http://localhost:4201/api/metrics/mongo-connections   
+
+Stop and remove the containers.
 
 # Create and update helm package
 
-`helm create fancy-micro-service-helm-package`
+`PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm create custom-metrics`   
+`PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm create scale-me`
+
+* In `values.yaml` set proper docker images and also set service type on `NodePort`.
+* Remove `livenessProbe` and `readinessProbe` from `deployment.yaml` because this is not mandatory.
+* Set env. variable `ASPNETCORE_ENVIRONMENT` on value `Development` in file `deployment.yaml` to have working swagger page.
 
 # Verify k8s connection settings
 
@@ -86,13 +115,16 @@ kubectl config use-context docker-desktop
 kubectl config current-context
 ```
 ```
-PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> kubectl get nodes
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> kubectl get nodes
 NAME             STATUS   ROLES           AGE   VERSION
-docker-desktop   Ready    control-plane   64s   v1.25.4
+docker-desktop   Ready    control-plane   24h   v1.25.4
 ```
 
->NOTE: if the K8s is not available `PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> kubectl get nodes
-Unable to connect to the server: EOF` try to use `Reset Kubernetes Cluster` option.
+**If the K8s is not available**:
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> kubectl get nodes Unable to connect to the server: EOF
+``` 
+try to use `Reset Kubernetes Cluster` option.
 ![01-reset-k8s.png](./images/01-reset-k8s.png)
 
 `helm` uses the same settings as `kubectl`.
@@ -100,104 +132,69 @@ Unable to connect to the server: EOF` try to use `Reset Kubernetes Cluster` opti
 # Verify helm package before deployment
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes\Keda> helm template fancy-micro-service-helm-package
-PS D:\GitHub\kicaj29\Kubernetes\Keda> helm install fancy-ms fancy-micro-service-helm-package --debug --dry-run
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm template scale-me
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm install ms-scale-me scale-me --debug --dry-run
 ```
 
-If the chart already exist uninstall it:
 ```
-PS D:\GitHub\kicaj29\Kubernetes\Keda> helm uninstall fancy-ms
-release "fancy-ms" uninstalled
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm template custom-metrics
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm install ms-custom-metrics custom-metrics --debug --dry-run
 ```
 
-# Install fancy-ms chart
+If the charts already exist uninstall it:
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm uninstall ms-custom-metrics
+release "ms-custom-metrics" uninstalled
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm uninstall ms-scale-me
+release "ms-scale-me" uninstalled
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts>
+```
+
+# Install both charts
 
 ```
-PS D:\GitHub\kicaj29\Kubernetes\Keda> helm install fancy-ms fancy-micro-service-helm-package
-NAME: fancy-ms
-LAST DEPLOYED: Wed Jul 26 15:26:47 2023
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm install ms-scale-me scale-me
+NAME: ms-scale-me
+LAST DEPLOYED: Thu Jul 27 15:12:04 2023
 NAMESPACE: default
 STATUS: deployed
 REVISION: 1
 NOTES:
 1. Get the application URL by running these commands:
-  export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services fancy-ms-fancy-micro-service-helm-package)
+  export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services ms-scale-me)
   export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 ```
 
-# Call fancy-ms
-
-Because by default helm chart uses `livenessProbe` and `readinessProbe` the pod fails to start.
-
 ```
-PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> kubectl get pods
-NAME                                                         READY   STATUS             RESTARTS      AGE
-fancy-ms-fancy-micro-service-helm-package-76bb66974b-j2qgv   0/1     CrashLoopBackOff   5 (84s ago)   5m4s
-```
-
-```
-PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> kubectl describe pod fancy-ms-fancy-micro-service-helm-package-76bb66974b-j2qgv
-...
-Events:
-  Type     Reason     Age                    From               Message
-  ----     ------     ----                   ----               -------
-  Normal   Scheduled  4m22s                  default-scheduler  Successfully assigned default/fancy-ms-fancy-micro-service-helm-package-76bb66974b-j2qgv to docker-desktop
-  Normal   Pulled     3m51s (x2 over 4m21s)  kubelet            Container image "kicaj29/fancymicroservice:v1" already present on machine
-  Normal   Created    3m51s (x2 over 4m21s)  kubelet            Created container fancy-micro-service-helm-package
-  Normal   Started    3m51s (x2 over 4m21s)  kubelet            Started container fancy-micro-service-helm-package
-  Warning  Unhealthy  3m51s (x2 over 4m20s)  kubelet            Readiness probe failed: Get "http://10.1.0.106:80/": dial tcp 10.1.0.106:80: connect: connection refused
-  Warning  Unhealthy  3m22s (x9 over 4m19s)  kubelet            Readiness probe failed: HTTP probe failed with statuscode: 404
-  Warning  Unhealthy  3m22s (x6 over 4m12s)  kubelet            Liveness probe failed: HTTP probe failed with statuscode: 404
-  Normal   Killing    3m22s (x2 over 3m52s)  kubelet            Container fancy-micro-service-helm-package failed liveness probe, will be restarted
-```
-
-To fix this problem necessary logic was added to the micro-service and the helm chart was updated to point correct urls and adjusted settings: `initialDelaySeconds`, `periodSeconds`, `successThreshold`, `failureThreshold`.
-
-# Install new version of the chart to fix problem with health checks
-
-* Build new image with endpoint for the health checks
-```
-PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> docker build -f Dockerfile -t kicaj29/fancymicroservice:v2 ..
-```
-
-* Uninstall previous version
-```
-PS D:\GitHub\kicaj29\Kubernetes\Keda> helm uninstall fancy-ms
-release "fancy-ms" uninstalled
-```
-
-* Install new version
-```
-helm install fancy-ms fancy-micro-service-helm-package
-NAME: fancy-ms
-LAST DEPLOYED: Wed Jul 26 16:23:36 2023
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm install ms-custom-metrics custom-metrics
+NAME: ms-custom-metrics
+LAST DEPLOYED: Thu Jul 27 15:12:28 2023
 NAMESPACE: default
 STATUS: deployed
 REVISION: 1
 NOTES:
 1. Get the application URL by running these commands:
-  export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services fancy-ms-fancy-micro-service-helm-package)
+  export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services ms-custom-metrics)
   export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 ```
 
-# Call fancy-ms again
-
-Check port of the service for fancy-ms
-```
-PS D:\GitHub\kicaj29\Kubernetes\Keda\FancyMicroservice\FancyMicroservice> kubectl get services
-NAME                                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
-fancy-ms-fancy-micro-service-helm-package   NodePort    10.110.11.179   <none>        80:30317/TCP   34s
-kubernetes                                  ClusterIP   10.96.0.1       <none>        443/TCP        96m
-```
-
-Next call from Chrome local machine (use localhost and not CLUSTER-IP), this time it should work:
+# Call both services
 
 ```
-http://localhost:30317/swagger/index.html
-http://localhost:30317/weatherforecast
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Charts> kubectl get services
+NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+kubernetes          ClusterIP   10.96.0.1        <none>        443/TCP        24h
+ms-custom-metrics   NodePort    10.109.250.186   <none>        80:31513/TCP   8s
+ms-scale-me         NodePort    10.110.209.73    <none>        80:32221/TCP   12s
 ```
+
+http://localhost:32221/weatherforecast   
+http://localhost:32221/swagger   
+
+http://localhost:31513/swagger   
+http://localhost:31513/api/metrics/mongo-connections   
 
 # Deploy Keda
 
@@ -226,5 +223,106 @@ TEST SUITE: None
 https://keda.sh/docs/2.11/scalers/metrics-api/
 https://github.com/kedacore/keda-docs/blob/main/content/docs/2.0/scalers/metrics-api.md
 
+Because keda controllers works in `keda` namespace in [keda.yaml](./keda.yaml) is used full DNS name which allow communication across different namespaces (micro-services are deployed into `default` namespace). More [here](https://stackoverflow.com/questions/37221483/service-located-in-another-namespace).
 
-#        url: "http://{{ include "fancy-micro-service-helm-package.fullname" . }}:80/api/metrics/mongo-connections"
+# Deploy keda.yaml
+
+[keda.yaml](./keda.yaml) must be deployed as separate deployment. If it is part of helm chart `scale-me` then `keda` logs error
+that target deployment does not exist, probably because `keda` starts before deployment `ms-scale-me`.
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda> kubectl apply -f keda.yaml
+scaledobject.keda.sh/metrics-api-mongo-pool-size created
+```
+
+
+# Review logs from keda-operator pod
+
+We can see that this operator created HPA "Creating a new HPA".
+
+```
+2023-07-27T13:26:26Z	INFO	Reconciling ScaledObject	{"controller": "scaledobject", "controllerGroup": "keda.sh", "controllerKind": "ScaledObject", "ScaledObject": {"name":"metrics-api-mongo-pool-size","namespace":"default"}, "namespace": "default", "name": "metrics-api-mongo-pool-size", "reconcileID": "32fb081e-27d6-4d57-8983-e90611e2878a"}
+2023-07-27T13:26:26Z	INFO	Adding Finalizer for the ScaledObject	{"controller": "scaledobject", "controllerGroup": "keda.sh", "controllerKind": "ScaledObject", "ScaledObject": {"name":"metrics-api-mongo-pool-size","namespace":"default"}, "namespace": "default", "name": "metrics-api-mongo-pool-size", "reconcileID": "32fb081e-27d6-4d57-8983-e90611e2878a"}
+2023-07-27T13:26:26Z	INFO	Detected resource targeted for scaling	{"controller": "scaledobject", "controllerGroup": "keda.sh", "controllerKind": "ScaledObject", "ScaledObject": {"name":"metrics-api-mongo-pool-size","namespace":"default"}, "namespace": "default", "name": "metrics-api-mongo-pool-size", "reconcileID": "32fb081e-27d6-4d57-8983-e90611e2878a", "resource": "apps/v1.Deployment", "name": "ms-scale-me"}
+2023-07-27T13:26:26Z	INFO	Creating a new HPA	{"controller": "scaledobject", "controllerGroup": "keda.sh", "controllerKind": "ScaledObject", "ScaledObject": {"name":"metrics-api-mongo-pool-size","namespace":"default"}, "namespace": "default", "name": "metrics-api-mongo-pool-size", "reconcileID": "32fb081e-27d6-4d57-8983-e90611e2878a", "HPA.Namespace": "default", "HPA.Name": "keda-hpa-metrics-api-mongo-pool-size"}
+2023-07-27T13:26:26Z	INFO	Initializing Scaling logic according to ScaledObject Specification	{"controller": "scaledobject", "controllerGroup": "keda.sh", "controllerKind": "ScaledObject", "ScaledObject": {"name":"metrics-api-mongo-pool-size","namespace":"default"}, "namespace": "default", "name": "metrics-api-mongo-pool-size", "reconcileID": "32fb081e-27d6-4d57-8983-e90611e2878a"}
+2023-07-27T13:26:26Z	INFO	Reconciling ScaledObject	{"controller": "scaledobject", "controllerGroup": "keda.sh", "controllerKind": "ScaledObject", "ScaledObject": {"name":"metrics-api-mongo-pool-size","namespace":"default"}, "namespace": "default", "name": "metrics-api-mongo-pool-size", "reconcileID": "ad76c0e2-c8a6-4424-ab8a-0b0e9a83f88b"}
+2023-07-27T13:26:26Z	INFO	Reconciling ScaledObject	{"controller": "scaledobject", "controllerGroup": "keda.sh", "controllerKind": "ScaledObject", "ScaledObject": {"name":"metrics-api-mongo-pool-size","namespace":"default"}, "namespace": "default", "name": "metrics-api-mongo-pool-size", "reconcileID": "4578e39c-0ef4-4a3d-b4f2-2e87e121c5a2"}
+```
+
+# Review ScaledObject status in Custom Resources section in OpenLens
+
+It is active and ready to use.
+
+![02-keda-ready.png](./images/02-keda-ready.png)
+
+# Review logs from ms-custom-metrics in OpenLens
+
+We can see keda asks about metrics every 5 seconds:
+
+```
+...
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:29:41 Reporting metric mongo-connections: 2.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:29:46 Reporting metric mongo-connections: 2.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:29:51 Reporting metric mongo-connections: 2.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:29:56 Reporting metric mongo-connections: 2.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:30:01 Reporting metric mongo-connections: 2.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:30:06 Reporting metric mongo-connections: 2.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:30:11 Reporting metric mongo-connections: 2.
+```
+
+# Increase metric value to scale-out the ms-scale-me pod
+
+Open swagger http://localhost:31513/swagger/index.html and change the value to 3.
+
+In the logs from `ms-custom-metrics` we can see that keda started receiving the new value
+
+```
+...
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:33:36 Reporting metric mongo-connections: 2.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:33:41 Reporting metric mongo-connections: 2.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:33:44 Updating metric mongo-connections with value 3.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:33:46 Reporting metric mongo-connections: 3.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:33:51 Reporting metric mongo-connections: 3.
+info: CustomMetrics.Controllers.MetricsController[0]
+      07/27/2023 13:33:56 Reporting metric mongo-connections: 3.
+```
+
+Also we can see that a new pod has been started:
+![03-keda-scale-out.png](./images/03-keda-scale-out.png)
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> kubectl get pods
+NAME                                 READY   STATUS    RESTARTS   AGE
+ms-custom-metrics-78c9b4c796-kf7mv   1/1     Running   0          23m
+ms-scale-me-75b45fcb9b-76s5p         1/1     Running   0          6m49s
+ms-scale-me-75b45fcb9b-hxpm9         1/1     Running   0          23m
+```
+
+# Decrease metric value to scale-in the ms-scale-me pod
+
+Open swagger http://localhost:31513/swagger/index.html and change the value to 1.
+
+We can see that one pod has been removed
+
+![04-keda-scale-in.png](./images/04-keda-scale-in.png)
+
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> kubectl get pods
+NAME                                 READY   STATUS    RESTARTS   AGE
+ms-custom-metrics-78c9b4c796-kf7mv   1/1     Running   0          26m
+ms-scale-me-75b45fcb9b-hxpm9         1/1     Running   0          26m
+```
+
