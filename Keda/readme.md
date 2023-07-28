@@ -456,7 +456,8 @@ Scaling logs can found by running this command (this version work only for deskt
 
 Sample logs:
 ```
- 11:49:18.209381       1 event.go:294] "Event occurred" object="default/ms-scale-me-75b45fcb9b" fieldPath="" kind="ReplicaSet" apiVersion="apps/v1" type="Normal" reason="SuccessfulCreate" message="Created pod: ms-scale-me-75b45fcb9b-97lj4"
+I0728 11:49:18.179813       1 event.go:294] "Event occurred" object="default/ms-scale-me" fieldPath="" kind="Deployment" apiVersion="apps/v1" type="Normal" reason="ScalingReplicaSet" message="Scaled up replica set ms-scale-me-75b45fcb9b to 2 from 1"
+I0728 11:49:18.209381       1 event.go:294] "Event occurred" object="default/ms-scale-me-75b45fcb9b" fieldPath="" kind="ReplicaSet" apiVersion="apps/v1" type="Normal" reason="SuccessfulCreate" message="Created pod: ms-scale-me-75b45fcb9b-97lj4"
 I0728 11:50:18.199898       1 horizontal.go:691] Successful rescale of keda-hpa-metrics-api-mongo-pool-size, old size: 2, new size: 3, reason: external metric s0-metric-api-currentWaitingSize(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: metrics-api-mongo-pool-size,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
 I0728 11:50:18.200103       1 event.go:294] "Event occurred" object="default/keda-hpa-metrics-api-mongo-pool-size" fieldPath="" kind="HorizontalPodAutoscaler" apiVersion="autoscaling/v2" type="Normal" reason="SuccessfulRescale" message="New size: 3; reason: external metric s0-metric-api-currentWaitingSize(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: metrics-api-mongo-pool-size,},MatchExpressions:[]LabelSelectorRequirement{},}) above target"
 I0728 11:50:18.214649       1 event.go:294] "Event occurred" object="default/ms-scale-me" fieldPath="" kind="Deployment" apiVersion="apps/v1" type="Normal" reason="ScalingReplicaSet" message="Scaled up replica set ms-scale-me-75b45fcb9b to 3 from 2"
