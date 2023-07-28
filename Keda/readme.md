@@ -443,11 +443,12 @@ When a targetAverageValue or targetAverageUtilization is specified, the currentM
 
 HPA settings used by kube-controller-manager can be found [here](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/)
 
-* `--horizontal-pod-autoscaler-cpu-initialization-period`, default: 5m0s. The period after pod start when CPU samples might be skipped.
-* `--horizontal-pod-autoscaler-downscale-stabilization`, default: 5m0s. The period for which autoscaler will look backwards and not scale down below any recommendation it made during that period.
-* `--horizontal-pod-autoscaler-initial-readiness-delay`, default: 30s. The period after pod start during which readiness changes will be treated as initial readiness.
-* `--horizontal-pod-autoscaler-sync-period`, default: 15s. The period for syncing the number of pods in horizontal pod autoscaler.
-* `--horizontal-pod-autoscaler-tolerance`, default: 0.1. The minimum change (from 1.0) in the desired-to-actual metrics ratio for the horizontal pod autoscaler to consider scaling.
+* `--horizontal-pod-autoscaler-cpu-initialization-period`, *default: 5m0s. The period after pod start when CPU samples might be skipped.*
+* `--horizontal-pod-autoscaler-downscale-stabilization`, *default: 5m0s. The period for which autoscaler will look backwards and not scale down below any recommendation it made during that period.* My observations show that after a single metric change we have to wait 5 mins to scale down the pods.
+  Probably if during this period the metric would be again decreased more pods would be shutdown after the 5 mins.
+* `--horizontal-pod-autoscaler-initial-readiness-delay`, *default: 30s. The period after pod start during which readiness changes will be treated as initial readiness.*
+* `--horizontal-pod-autoscaler-sync-period`, *default: 15s. The period for syncing the number of pods in horizontal pod autoscaler.*
+* `--horizontal-pod-autoscaler-tolerance`, *default: 0.1. The minimum change (from 1.0) in the desired-to-actual metrics ratio for the horizontal pod autoscaler to consider scaling.*
 
 
 ## Logs from scaling events 
