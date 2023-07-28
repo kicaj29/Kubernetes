@@ -13,6 +13,7 @@
 - [Review logs from ms-custom-metrics in OpenLens](#review-logs-from-ms-custom-metrics-in-openlens)
 - [Increase metric value to scale-out the ms-scale-me pod](#increase-metric-value-to-scale-out-the-ms-scale-me-pod)
 - [Decrease metric value to scale-in the ms-scale-me pod](#decrease-metric-value-to-scale-in-the-ms-scale-me-pod)
+- [Deep dive into the scaling](#deep-dive-into-the-scaling)
 
 # Docker login
 
@@ -413,3 +414,33 @@ ms-custom-metrics-78c9b4c796-kf7mv   1/1     Running   0          26m
 ms-scale-me-75b45fcb9b-hxpm9         1/1     Running   0          26m
 ```
 
+# Deep dive into the scaling
+
+https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/#autoscaling-on-metrics-not-related-to-kubernetes-objects   
+
+*External metrics support both the Value and AverageValue target types, which function exactly the same as when you use the Object type.*
+
+https://isitobservable.io/observability/kubernetes/how-to-autoscale-in-kubernetes-and-how-to-observe-scaling-decisions   
+
+*averageValue: the target value of the average metric across all the relevant pods.*
+
+https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#metrictarget-v2-autoscaling   
+
+*averageValue is the target value of the average of the metric across all relevant pods (as a quantity)*
+
+https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#algorithm-details   
+
+*desiredReplicas = ceil[currentReplicas * ( currentMetricValue / desiredMetricValue )]*
+
+For example, if the current metric value is 200m, and the desired value is 100m, the number of replicas will be doubled, since 200.0 / 100.0 == 2.0 If the current value is instead 50m, you'll halve the number of replicas, since 50.0 / 100.0 == 0.5. The control plane skips any scaling action if the ratio is sufficiently close to 1.0 (within a globally-configurable tolerance, 0.1 by default).
+
+When a targetAverageValue or targetAverageUtilization is specified, the currentMetricValue is computed by taking the average of the given metric across all Pods in the HorizontalPodAutoscaler's scale target.
+
+https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/   
+https://ranchermanager.docs.rancher.com/v2.7/how-to-guides/new-user-guides/kubernetes-resources-setup/horizontal-pod-autoscaler/about-hpas   
+
+* --horizontal-pod-autoscaler-sync-period: How often HPA audits resource/custom metrics in a deployment. Default interval is 15 seconds
+* --horizontal-pod-autoscaler-downscale-delay: Following completion of a downscale operation, how long HPA must wait before launching another downscale operations. Default interval is 5 mins
+* --horizontal-pod-autoscaler-upscale-delay: Following completion of an upscale operation, how long HPA must wait before launching another upscale operation. Default interval is 3 mins.
+
+https://github.com/kubernetes/design-proposals-archive/blob/main/autoscaling/horizontal-pod-autoscaler.md#horizontalpodautoscaler-object   
