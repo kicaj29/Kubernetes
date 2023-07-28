@@ -458,7 +458,7 @@ Scaling logs can found by running this command (this version work only for deskt
 
 `PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> kubectl get pod kube-controller-manager-docker-desktop -o yaml -n kube-system`
 
-We can see that `--horizontal-pod-autoscaler-sync-period` has value 60s which is different than its default value.
+We can see that `--horizontal-pod-autoscaler-sync-period` has **value 60s** which is different than its default value.
 
 <details>
 
