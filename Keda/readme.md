@@ -14,6 +14,9 @@
 - [Increase metric value to scale-out the ms-scale-me pod](#increase-metric-value-to-scale-out-the-ms-scale-me-pod)
 - [Decrease metric value to scale-in the ms-scale-me pod](#decrease-metric-value-to-scale-in-the-ms-scale-me-pod)
 - [Deep dive into the scaling](#deep-dive-into-the-scaling)
+  - [Important HPA settings in kube-controller-manager](#important-hpa-settings-in-kube-controller-manager)
+  - [Logs from scaling events](#logs-from-scaling-events)
+  - [Verify kube-controller-manager parameters](#verify-kube-controller-manager-parameters)
 
 # Docker login
 
@@ -436,11 +439,209 @@ For example, if the current metric value is 200m, and the desired value is 100m,
 
 When a targetAverageValue or targetAverageUtilization is specified, the currentMetricValue is computed by taking the average of the given metric across all Pods in the HorizontalPodAutoscaler's scale target.
 
-https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/   
-https://ranchermanager.docs.rancher.com/v2.7/how-to-guides/new-user-guides/kubernetes-resources-setup/horizontal-pod-autoscaler/about-hpas   
+## Important HPA settings in kube-controller-manager
 
-* --horizontal-pod-autoscaler-sync-period: How often HPA audits resource/custom metrics in a deployment. Default interval is 15 seconds
-* --horizontal-pod-autoscaler-downscale-delay: Following completion of a downscale operation, how long HPA must wait before launching another downscale operations. Default interval is 5 mins
-* --horizontal-pod-autoscaler-upscale-delay: Following completion of an upscale operation, how long HPA must wait before launching another upscale operation. Default interval is 3 mins.
+HPA settings used by kube-controller-manager can be found [here](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/)
 
-https://github.com/kubernetes/design-proposals-archive/blob/main/autoscaling/horizontal-pod-autoscaler.md#horizontalpodautoscaler-object   
+* `--horizontal-pod-autoscaler-cpu-initialization-period`, default: 5m0s. The period after pod start when CPU samples might be skipped.
+* `--horizontal-pod-autoscaler-downscale-stabilization`, default: 5m0s. The period for which autoscaler will look backwards and not scale down below any recommendation it made during that period.
+* `--horizontal-pod-autoscaler-initial-readiness-delay`, default: 30s. The period after pod start during which readiness changes will be treated as initial readiness.
+* `--horizontal-pod-autoscaler-sync-period`, default: 15s. The period for syncing the number of pods in horizontal pod autoscaler.
+* `--horizontal-pod-autoscaler-tolerance`, default: 0.1. The minimum change (from 1.0) in the desired-to-actual metrics ratio for the horizontal pod autoscaler to consider scaling.
+
+
+## Logs from scaling events 
+
+Scaling logs can found by running this command (this version work only for desktop-host): `kubectl logs -n kube-system kube-controller-manager-docker-desktop`.
+
+## Verify kube-controller-manager parameters
+
+`PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> kubectl get pod kube-controller-manager-docker-desktop -o yaml -n kube-system`
+
+We can see that `--horizontal-pod-autoscaler-sync-period` has value 60s which is different than its default value.
+
+<details>
+
+<summary>kube-controller-manager-docker-desktop yaml</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubernetes.io/config.hash: 211995fd65d7f9f21c930562c0757229
+    kubernetes.io/config.mirror: 211995fd65d7f9f21c930562c0757229
+    kubernetes.io/config.seen: "2023-07-26T12:55:40.832731700Z"
+    kubernetes.io/config.source: file
+  creationTimestamp: "2023-07-26T12:55:48Z"
+  labels:
+    component: kube-controller-manager
+    tier: control-plane
+  name: kube-controller-manager-docker-desktop
+  namespace: kube-system
+  ownerReferences:
+  - apiVersion: v1
+    controller: true
+    kind: Node
+    name: docker-desktop
+    uid: dfb53b44-483d-480d-a17d-07f6e2f2ef54
+  resourceVersion: "357"
+  uid: 292f64fe-4351-4d18-8b25-2290019c5ec0
+spec:
+  containers:
+  - command:
+    - kube-controller-manager
+    - --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --bind-address=127.0.0.1
+    - --client-ca-file=/run/config/pki/ca.crt
+    - --cluster-name=kubernetes
+    - --cluster-signing-cert-file=/run/config/pki/ca.crt
+    - --cluster-signing-key-file=/run/config/pki/ca.key
+    - --controllers=*,bootstrapsigner,tokencleaner
+    - --horizontal-pod-autoscaler-sync-period=60s
+    - --kubeconfig=/etc/kubernetes/controller-manager.conf
+    - --leader-elect=false
+    - --node-monitor-grace-period=180s
+    - --node-monitor-period=30s
+    - --pvclaimbinder-sync-period=60s
+    - --requestheader-client-ca-file=/run/config/pki/front-proxy-ca.crt
+    - --root-ca-file=/run/config/pki/ca.crt
+    - --service-account-private-key-file=/run/config/pki/sa.key
+    - --use-service-account-credentials=true
+    image: registry.k8s.io/kube-controller-manager:v1.25.4
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 15
+    name: kube-controller-manager
+    resources:
+      requests:
+        cpu: 200m
+    startupProbe:
+      failureThreshold: 24
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 10257
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 15
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /etc/ssl/certs
+      name: ca-certs
+      readOnly: true
+    - mountPath: /etc/ca-certificates
+      name: etc-ca-certificates
+      readOnly: true
+    - mountPath: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      name: flexvolume-dir
+    - mountPath: /run/config/pki
+      name: k8s-certs
+      readOnly: true
+    - mountPath: /etc/kubernetes/controller-manager.conf
+      name: kubeconfig
+      readOnly: true
+    - mountPath: /usr/local/share/ca-certificates
+      name: usr-local-share-ca-certificates
+      readOnly: true
+    - mountPath: /usr/share/ca-certificates
+      name: usr-share-ca-certificates
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostNetwork: true
+  nodeName: docker-desktop
+  preemptionPolicy: PreemptLowerPriority
+  priority: 2000001000
+  priorityClassName: system-node-critical
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    operator: Exists
+  volumes:
+  - hostPath:
+      path: /etc/ssl/certs
+      type: DirectoryOrCreate
+    name: ca-certs
+  - hostPath:
+      path: /etc/ca-certificates
+      type: DirectoryOrCreate
+    name: etc-ca-certificates
+  - hostPath:
+      path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+      type: DirectoryOrCreate
+    name: flexvolume-dir
+  - hostPath:
+      path: /run/config/pki
+      type: DirectoryOrCreate
+    name: k8s-certs
+  - hostPath:
+      path: /etc/kubernetes/controller-manager.conf
+      type: FileOrCreate
+    name: kubeconfig
+  - hostPath:
+      path: /usr/local/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-local-share-ca-certificates
+  - hostPath:
+      path: /usr/share/ca-certificates
+      type: DirectoryOrCreate
+    name: usr-share-ca-certificates
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2023-07-26T12:55:41Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2023-07-26T12:55:58Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2023-07-26T12:55:58Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2023-07-26T12:55:41Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://376997b8bce8e7511e9721dba09c7f08249cec75129db9c4c6271560b39d9dad
+    image: registry.k8s.io/kube-controller-manager:v1.25.4
+    imageID: docker://sha256:8f59f6dfaed60b6613fdb2b50a9dd31584e52f56513b01ce4bb779da5ee0cbd1
+    lastState: {}
+    name: kube-controller-manager
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2023-07-26T12:55:43Z"
+  hostIP: 192.168.65.4
+  phase: Running
+  podIP: 192.168.65.4
+  podIPs:
+  - ip: 192.168.65.4
+  qosClass: Burstable
+  startTime: "2023-07-26T12:55:41Z"
+```
+
+</details>
