@@ -250,6 +250,93 @@ We can see that this operator created HPA "Creating a new HPA".
 2023-07-27T13:26:26Z	INFO	Reconciling ScaledObject	{"controller": "scaledobject", "controllerGroup": "keda.sh", "controllerKind": "ScaledObject", "ScaledObject": {"name":"metrics-api-mongo-pool-size","namespace":"default"}, "namespace": "default", "name": "metrics-api-mongo-pool-size", "reconcileID": "4578e39c-0ef4-4a3d-b4f2-2e87e121c5a2"}
 ```
 
+```
+PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\ScaleMe> kubectl get hpa
+NAME                                   REFERENCE                TARGETS     MINPODS   MAXPODS   REPLICAS   AGE
+keda-hpa-metrics-api-mongo-pool-size   Deployment/ms-scale-me   1/2 (avg)   1         5         1          16h
+```
+
+* By running command `PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> kubectl get hpa keda-hpa-metrics-api-mongo-pool-size -o yaml` we can print yaml definition of the created HPA
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"keda.sh/v1alpha1","kind":"ScaledObject","metadata":{"annotations":{},"labels":{"deploymentName":"metrics-api-mongo-pool-size"},"name":"metrics-api-mongo-pool-size","namespace":"default"},"spec":{"cooldownPeriod":10,"maxReplicaCount":5,"minReplicaCount":0,"pollingInterval":5,"scaleTargetRef":{"name":"ms-scale-me"},"triggers":[{"metadata":{"targetValue":"2","url":"http://ms-custom-metrics.default.svc.cluster.local:80/api/metrics/mongo-connections","valueLocation":"currentWaitingSize"},"type":"metrics-api"}]}}
+  creationTimestamp: "2023-07-27T13:26:26Z"
+  labels:
+    app.kubernetes.io/managed-by: keda-operator
+    app.kubernetes.io/name: keda-hpa-metrics-api-mongo-pool-size
+    app.kubernetes.io/part-of: metrics-api-mongo-pool-size
+    app.kubernetes.io/version: 2.11.1
+    deploymentName: metrics-api-mongo-pool-size
+    scaledobject.keda.sh/name: metrics-api-mongo-pool-size
+  name: keda-hpa-metrics-api-mongo-pool-size
+  namespace: default
+  ownerReferences:
+  - apiVersion: keda.sh/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ScaledObject
+    name: metrics-api-mongo-pool-size
+    uid: 225de180-41c1-40d9-bb6e-3d2f8d62c4b0
+  resourceVersion: "103256"
+  uid: 404f7edb-a0b1-474e-87bd-3e3a6a129261
+spec:
+  maxReplicas: 5
+  metrics:
+  - external:
+      metric:
+        name: s0-metric-api-currentWaitingSize
+        selector:
+          matchLabels:
+            scaledobject.keda.sh/name: metrics-api-mongo-pool-size
+      target:
+        averageValue: "2"
+        type: AverageValue
+    type: External
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ms-scale-me
+status:
+  conditions:
+  - lastTransitionTime: "2023-07-28T06:06:08Z"
+    message: recommended size matches current size
+    reason: ReadyForNewScale
+    status: "True"
+    type: AbleToScale
+  - lastTransitionTime: "2023-07-27T13:27:26Z"
+    message: 'the HPA was able to successfully calculate a replica count from external
+      metric s0-metric-api-currentWaitingSize(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name:
+      metrics-api-mongo-pool-size,},MatchExpressions:[]LabelSelectorRequirement{},})'
+    reason: ValidMetricFound
+    status: "True"
+    type: ScalingActive
+  - lastTransitionTime: "2023-07-27T13:27:26Z"
+    message: the desired count is within the acceptable range
+    reason: DesiredWithinRange
+    status: "False"
+    type: ScalingLimited
+  currentMetrics:
+  - external:
+      current:
+        averageValue: "1"
+        value: "0"
+      metric:
+        name: s0-metric-api-currentWaitingSize
+        selector:
+          matchLabels:
+            scaledobject.keda.sh/name: metrics-api-mongo-pool-size
+    type: External
+  currentReplicas: 1
+  desiredReplicas: 1
+  lastScaleTime: "2023-07-27T13:43:27Z"
+```
+
 # Review ScaledObject status in Custom Resources section in OpenLens
 
 It is active and ready to use.
