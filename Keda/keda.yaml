@@ -8,6 +8,10 @@ metadata:
 spec:
   scaleTargetRef:
     name: ms-scale-me
+  # this is not interval for scaling pods, interval for scaling pods is controlled by kube-controller-manager parameters:
+  # --horizontal-pod-autoscaler-downscale-stabilization
+  # --horizontal-pod-autoscaler-initial-readiness-delay
+  # --horizontal-pod-autoscaler-sync-period
   pollingInterval: 5
   cooldownPeriod: 10
   minReplicaCount: 1
