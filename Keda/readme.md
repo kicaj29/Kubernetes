@@ -461,12 +461,12 @@ Following this algorithm explained above *desiredReplicas = ceil[currentReplicas
 I tested the algorithm using K8s from docker desktop but it looks that `currentReplicas` is always 1 even when I set
 `replicaCount: 3` in deployment [values.yaml](./Charts/scale-me/values.yaml) and `minReplicaCount: 3` in [keda.yaml](./keda.yaml). Observed values do not match to values calculated by the algorithm - maybe this is something specific to docker desktop. It would require more research to understand it.
 
-3 = ceil[3 * (2 / 2)]
-5 = ceil[3 * (3 / 2)] but I had only 3 pods!
-6 = ceil[3 * (4 / 2)] but I had only 3 pods!
-8 = ceil[3 * (5 / 2)] but I had only 3 pods!
-9 = ceil[3 * (6 / 2)] but I had only 3 pods!
-11 = ceil[3 * (7 / 2)] but I had only 4 pods!
+3 = ceil[3 * (2 / 2)]   
+5 = ceil[3 * (3 / 2)] but I had only 3 pods!   
+6 = ceil[3 * (4 / 2)] but I had only 3 pods!   
+8 = ceil[3 * (5 / 2)] but I had only 3 pods!   
+9 = ceil[3 * (6 / 2)] but I had only 3 pods!   
+11 = ceil[3 * (7 / 2)] but I had only **4 pods**!   
 
 ## Important HPA settings in kube-controller-manager
 
