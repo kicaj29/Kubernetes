@@ -8,7 +8,7 @@
 - [Deploy Keda](#deploy-keda)
 - [Configure keda ScaledObject](#configure-keda-scaledobject)
 - [Deploy keda.yaml](#deploy-kedayaml)
-- [Review logs from keda-operator pod](#review-logs-from-keda-operator-pod)
+- [Review logs from keda-operator pod and review created HPA](#review-logs-from-keda-operator-pod-and-review-created-hpa)
 - [Review ScaledObject status in Custom Resources section in OpenLens](#review-scaledobject-status-in-custom-resources-section-in-openlens)
 - [Review logs from ms-custom-metrics in OpenLens](#review-logs-from-ms-custom-metrics-in-openlens)
 - [Increase metric value to scale-out the ms-scale-me pod](#increase-metric-value-to-scale-out-the-ms-scale-me-pod)
@@ -241,7 +241,7 @@ scaledobject.keda.sh/metrics-api-mongo-pool-size created
 ```
 
 
-# Review logs from keda-operator pod
+# Review logs from keda-operator pod and review created HPA
 
 We can see that this operator created HPA "Creating a new HPA".
 
@@ -261,7 +261,8 @@ NAME                                   REFERENCE                TARGETS     MINP
 keda-hpa-metrics-api-mongo-pool-size   Deployment/ms-scale-me   1/2 (avg)   1         5         1          16h
 ```
 
-* By running command `PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> kubectl get hpa keda-hpa-metrics-api-mongo-pool-size -o yaml` we can print yaml definition of the created HPA
+* By running command `PS D:\GitHub\kicaj29\Kubernetes\Keda\Scaling\CustomMetrics> kubectl get hpa keda-hpa-metrics-api-mongo-pool-size -o yaml` we can print yaml definition of the created HPA.   
+For the second metric run `kubectl get hpa keda-hpa-metrics-api-sqs-current-size -o yaml` to see the HPA.
 
 ```yaml
 apiVersion: autoscaling/v2
@@ -450,6 +451,10 @@ Following this algorithm explained above *desiredReplicas = ceil[currentReplicas
 2 = ceil[1 * (4 / 2)]   
 3 = ceil[1 * (5 / 2)]   
 3 = ceil[1 * (6 / 2)]   
+4 = ceil[1 * (7 / 2)]   
+4 = ceil[1 * (8 / 2)]   
+5 = ceil[1 * (9 / 2)]   
+5 = ceil[1 * (10 / 2)]   
 
 >NOTE: **it looks that meaning of *currentReplicas* replicas is a bit different than its name and probably it means initial replicas count after deployment. Verification of this would required additional investigation. From my observation I see that for example if the amount of pods is 2 and I increase metric from 4 to 6 only one more pod is scheduled and finally 3 pods are available but from the algorithm we would get ceil[2 * (6/2)] = 6.**
 

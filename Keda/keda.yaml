@@ -1,20 +1,20 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: metrics-api-mongo-pool-size
+  name: metrics-api-sqs-current-size
   namespace: default
   labels:
-    deploymentName: metrics-api-mongo-pool-size
+    deploymentName: metrics-api-sqs-current-size
 spec:
   scaleTargetRef:
     name: ms-scale-me
   pollingInterval: 5
   cooldownPeriod: 10
-  minReplicaCount: 0
-  maxReplicaCount: 5
+  minReplicaCount: 1
+  maxReplicaCount: 10
   triggers:
     - type: metrics-api
       metadata:
         targetValue: "2"
-        url: "http://ms-custom-metrics.default.svc.cluster.local:80/api/metrics/mongo-connections"
-        valueLocation: 'currentWaitingSize'
+        url: "http://ms-custom-metrics.default.svc.cluster.local:80/api/metrics/sqs-messages-count"
+        valueLocation: 'currentMessagesCount'
