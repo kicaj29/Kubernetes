@@ -8,7 +8,7 @@ image:
   repository: kicaj29/custom-metrics
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v2"
+  tag: "v1"
 
 imagePullSecrets: []
 nameOverride: ""

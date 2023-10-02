@@ -214,13 +214,40 @@ Hang tight while we grab the latest from your chart repositories...
 ...Successfully got an update from the "ingress-nginx" chart repository
 ...Successfully got an update from the "stable" chart repository
 Update Complete. ⎈Happy Helming!⎈
-PS D:\GitHub\kicaj29\Kubernetes\Keda> helm install keda kedacore/keda --namespace keda --create-namespace
+PS D:\GitHub\kicaj29\Kubernetes\Keda> helm install keda kedacore/keda --version 2.11.2 --namespace keda --create-namespace
 NAME: keda
 LAST DEPLOYED: Wed Jul 26 18:06:51 2023
 NAMESPACE: keda
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
+```
+
+To see newest available keda versions run:
+
+```
+PS C:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm search repo kedacore
+NAME                                            CHART VERSION   APP VERSION     DESCRIPTION
+kedacore/external-scaler-azure-cosmos-db        0.1.0           0.1.0           Event-based autoscaler for Azure Cosmos DB chan...
+kedacore/keda                                   2.12.0          2.12.0          Event-based autoscaler for workloads on Kubernetes
+kedacore/keda-add-ons-http                      0.5.3           0.5.0           Event-based autoscaler for HTTP workloads on Ku...
+PS C:\GitHub\kicaj29\Kubernetes\Keda\Charts>
+```
+
+To see all versions from selected package run
+
+```
+PS C:\GitHub\kicaj29\Kubernetes\Keda\Charts> helm search repo kedacore/keda --versions
+NAME                            CHART VERSION   APP VERSION     DESCRIPTION
+kedacore/keda                   2.12.0          2.12.0          Event-based autoscaler for workloads on Kubernetes
+kedacore/keda                   2.11.2          2.11.2          Event-based autoscaler for workloads on Kubernetes
+kedacore/keda                   2.11.1          2.11.1          Event-based autoscaler for workloads on Kubernetes
+kedacore/keda                   2.11.0          2.11.0          Event-based autoscaler for workloads on Kubernetes
+kedacore/keda                   2.10.2          2.10.1          Event-based autoscaler for workloads on Kubernetes
+kedacore/keda                   2.10.1          2.10.0          Event-based autoscaler for workloads on Kubernetes
+kedacore/keda                   2.10.0          2.10.0          Event-based autoscaler for workloads on Kubernetes
+kedacore/keda                   2.9.4           2.9.3           Event-based autoscaler for workloads on Kubernetes
+...
 ```
 
 # Configure keda ScaledObject
