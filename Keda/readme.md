@@ -267,6 +267,7 @@ PS D:\GitHub\kicaj29\Kubernetes\Keda> kubectl apply -f keda.yaml
 scaledobject.keda.sh/metrics-api-mongo-pool-size created
 ```
 
+To remove `keda.yaml` run `kubectl delete -f keda.yaml`.
 
 # Review logs from keda-operator pod and review created HPA
 
