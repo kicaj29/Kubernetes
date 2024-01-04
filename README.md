@@ -891,6 +891,7 @@ More about this can be found here https://github.com/argoproj/argo-cd/issues/196
   ```
   kubectl get hpa --all-namespaces -o custom-columns="apiVersion":.apiVersion,"name":.metadata.name
   ```
+* See also https://technekey.com/customizing-the-kubectl-output/
 
 # resources
 https://app.pluralsight.com/library/courses/getting-started-kubernetes    
