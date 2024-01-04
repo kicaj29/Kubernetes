@@ -50,6 +50,7 @@
 - [Kubernetes dashboard](#kubernetes-dashboard)
 - [Selectors: equality-based and set-based](#selectors-equality-based-and-set-based)
 - [OpenLens and K8s from Docker Desktop](#openlens-and-k8s-from-docker-desktop)
+- [Cool commands](#cool-commands)
 - [resources](#resources)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
@@ -883,6 +884,13 @@ Sample configuration:
 ```
 
 More about this can be found here https://github.com/argoproj/argo-cd/issues/1965
+
+# Cool commands
+
+* Print all HPAs with their apiVersion and name
+  ```
+  kubectl get hpa --all-namespaces -o custom-columns="apiVersion":.apiVersion,"name":.metadata.name
+  ```
 
 # resources
 https://app.pluralsight.com/library/courses/getting-started-kubernetes    
