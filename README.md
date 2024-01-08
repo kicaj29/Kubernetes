@@ -306,6 +306,7 @@ Works without problems on Win10!.
 [apply vs create](https://intellipaat.com/community/468/difference-between-kubectl-apply-and-kubectl-create)   
 https://kubernetes.io/docs/tasks/manage-kubernetes-objects/imperative-config/   
 https://kubernetes.io/docs/tasks/manage-kubernetes-objects/declarative-config/   
+https://medium.com/@emmaliaocode/kubectl-create-vs-kubectl-apply-whats-the-differences-f6472f4c6c86   
 
 
 | Kubectl apply (declarative)       | Kubectl create (imperative)          | 
