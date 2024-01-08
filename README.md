@@ -897,6 +897,10 @@ More about this can be found here https://github.com/argoproj/argo-cd/issues/196
   ```
   kubectl get hpa --all-namespaces -o json | findstr apiVersion | findstr autoscaling
   ```
+* Print `yaml` file of the selected HPA
+  ```
+  kubectl get hpa ms-recognition --namespace test -o yaml
+  ```
 * See also https://technekey.com/customizing-the-kubectl-output/
 
 # resources
