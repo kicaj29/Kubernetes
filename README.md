@@ -893,7 +893,7 @@ More about this can be found here https://github.com/argoproj/argo-cd/issues/196
   kubectl get hpa --all-namespaces -o custom-columns="apiVersion":.apiVersion,"name":.metadata.name
   ```
   
-  Sometimes the above command returns error: `error: a resource cannot be retrieved by name across all namespaces` (not sure why), the following command might be better way to view all used api versions by HPA also because it scans all yaml files and can find more:
+  Sometimes (probably it works only in CMD and does not work in PS) the above command returns error: `error: a resource cannot be retrieved by name across all namespaces` (not sure why), the following command might be better way to view all used api versions by HPA also because it scans all yaml files and can find more:
   ```
   kubectl get hpa --all-namespaces -o json | findstr apiVersion | findstr autoscaling
   ```
