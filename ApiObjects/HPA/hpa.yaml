@@ -55,4 +55,8 @@ spec:
   minReplicas: 1
   maxReplicas: 10
   # a new pod will be created if pod CPU exceeds 250m (it is calculated from requests.CPU and not limits.CPU)
+  # https://medium.com/@kennethtcp/auto-scaling-in-kubernetes-for-more-cpu-resources-by-hpa-and-ca-8b8db4f75654
+  # This parameter represents the average CPU utilization across all pods in a deployment, expressed as a percentage of the requested CPU of each pod.
+  # I have 3 PHP-servers which are consuming 150, 200, 100 millicore respectively, and my requested CPU resources for this deployment is set to 300
+  # then the usage is (150+200+100) / (300x3) = 50% and this value is compared with targetCPUUtilizationPercentage
   targetCPUUtilizationPercentage: 50
